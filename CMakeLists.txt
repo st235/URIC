@@ -42,6 +42,10 @@ add_executable(uric_tests
   # Parser tests.
   tests/uri_parser_validation_decOctet.cpp
   tests/uri_parser_validation_pathAbempty.cpp
+  tests/uri_parser_validation_pathAbsolute.cpp
+  tests/uri_parser_validation_pathEmpty.cpp
+  tests/uri_parser_validation_pathNoscheme.cpp
+  tests/uri_parser_validation_pathRootless.cpp
   tests/uri_parser_validation_pchar.cpp
   tests/uri_parser_validation_pctEncoded.cpp
   tests/uri_parser_validation_queryFragment.cpp
