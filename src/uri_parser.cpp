@@ -332,7 +332,7 @@ bool IPLiteral(TokenReader& reader) {
         return false;
     }
 
-    if (!IPv6Address(reader) && !IPvFuture(reader)) {
+    if (!IPv6address(reader) && !IPvFuture(reader)) {
         reader.restore(token);
         return false;
     }
@@ -412,7 +412,7 @@ bool IPv6H16PartRepeatExactly(TokenReader& reader, size_t k) {
     return true;
 }
 
-bool IPv6H16PartRepeatAtMost(TokenReader& reader, size_t k) {
+bool IPv6address_optional(TokenReader& reader, size_t k) {
     auto token = reader.save();
 
     size_t repeat_counter = 0;
@@ -420,15 +420,29 @@ bool IPv6H16PartRepeatAtMost(TokenReader& reader, size_t k) {
         repeat_counter += 1;
     }
 
-    if (repeat_counter < k) {
+    if (!h16(reader)) {
         reader.restore(token);
-        return false;
+
+        size_t kn = repeat_counter - 1;
+        if (kn < 0) {
+            kn = 0;
+        }
+        repeat_counter = 0;
+
+        while (repeat_counter < kn && IPv6H16Part(reader)) {
+            repeat_counter += 1;
+        }
+
+        if (!h16(reader)) {
+            reader.restore(token);
+            return false;
+        }
     }
 
     return true;
 }
 
-bool IPv6AddressVariation1(TokenReader& reader) {
+bool IPv6addressVariation1(TokenReader& reader) {
     auto token = reader.save();
     
     if (!IPv6H16PartRepeatExactly(reader, 6)) {
@@ -444,7 +458,7 @@ bool IPv6AddressVariation1(TokenReader& reader) {
     return true;
 }
 
-bool IPv6AddressVariation2(TokenReader& reader) {
+bool IPv6addressVariation2(TokenReader& reader) {
     auto token = reader.save();
 
     if (!reader.consumeAll("::")) {
@@ -465,7 +479,7 @@ bool IPv6AddressVariation2(TokenReader& reader) {
     return true;
 }
 
-bool IPv6AddressVariation3(TokenReader& reader) {
+bool IPv6addressVariation3(TokenReader& reader) {
     auto token = reader.save();
 
     // Optional.
@@ -489,13 +503,10 @@ bool IPv6AddressVariation3(TokenReader& reader) {
     return true;
 }
 
-bool IPv6AddressVariation4(TokenReader& reader) {
+bool IPv6addressVariation4(TokenReader& reader) {
     auto token = reader.save();
 
-    if (IPv6H16PartRepeatAtMost(reader, 1) && !h16(reader)) {
-        reader.restore(token);
-        return false;
-    }
+    IPv6address_optional(reader, 1);
 
     if (!reader.consumeAll("::")) {
         reader.restore(token);
@@ -515,13 +526,10 @@ bool IPv6AddressVariation4(TokenReader& reader) {
     return true;
 }
 
-bool IPv6AddressVariation5(TokenReader& reader) {
+bool IPv6addressVariation5(TokenReader& reader) {
     auto token = reader.save();
 
-    if (IPv6H16PartRepeatAtMost(reader, 2) && !h16(reader)) {
-        reader.restore(token);
-        return false;
-    }
+    IPv6address_optional(reader, 2);
 
     if (!reader.consumeAll("::")) {
         reader.restore(token);
@@ -541,13 +549,10 @@ bool IPv6AddressVariation5(TokenReader& reader) {
     return true;
 }
 
-bool IPv6AddressVariation6(TokenReader& reader) {
+bool IPv6addressVariation6(TokenReader& reader) {
     auto token = reader.save();
 
-    if (IPv6H16PartRepeatAtMost(reader, 3) && !h16(reader)) {
-        reader.restore(token);
-        return false;
-    }
+    IPv6address_optional(reader, 3);
 
     if (!reader.consumeAll("::")) {
         reader.restore(token);
@@ -567,13 +572,10 @@ bool IPv6AddressVariation6(TokenReader& reader) {
     return true;
 }
 
-bool IPv6AddressVariation7(TokenReader& reader) {
+bool IPv6addressVariation7(TokenReader& reader) {
     auto token = reader.save();
 
-    if (IPv6H16PartRepeatAtMost(reader, 4) && !h16(reader)) {
-        reader.restore(token);
-        return false;
-    }
+    IPv6address_optional(reader, 4);
 
     if (!reader.consumeAll("::")) {
         reader.restore(token);
@@ -588,13 +590,10 @@ bool IPv6AddressVariation7(TokenReader& reader) {
     return true;
 }
 
-bool IPv6AddressVariation8(TokenReader& reader) {
+bool IPv6addressVariation8(TokenReader& reader) {
     auto token = reader.save();
 
-    if (IPv6H16PartRepeatAtMost(reader, 5) && !h16(reader)) {
-        reader.restore(token);
-        return false;
-    }
+    IPv6address_optional(reader, 5);
 
     if (!reader.consumeAll("::")) {
         reader.restore(token);
@@ -609,13 +608,10 @@ bool IPv6AddressVariation8(TokenReader& reader) {
     return true;
 }
 
-bool IPv6AddressVariation9(TokenReader& reader) {
+bool IPv6addressVariation9(TokenReader& reader) {
     auto token = reader.save();
 
-    if (IPv6H16PartRepeatAtMost(reader, 6) && !h16(reader)) {
-        reader.restore(token);
-        return false;
-    }
+    IPv6address_optional(reader, 6);
 
     if (!reader.consumeAll("::")) {
         reader.restore(token);
@@ -625,18 +621,18 @@ bool IPv6AddressVariation9(TokenReader& reader) {
     return true;
 }
 
-bool IPv6Address(TokenReader& reader) {
+bool IPv6address(TokenReader& reader) {
     auto token = reader.save();
 
-    if (IPv6AddressVariation1(reader) ||
-        IPv6AddressVariation2(reader) ||
-        IPv6AddressVariation3(reader) ||
-        IPv6AddressVariation4(reader) ||
-        IPv6AddressVariation5(reader) ||
-        IPv6AddressVariation6(reader) ||
-        IPv6AddressVariation7(reader) ||
-        IPv6AddressVariation8(reader) ||
-        IPv6AddressVariation9(reader)) {
+    if (IPv6addressVariation1(reader) ||
+        IPv6addressVariation2(reader) ||
+        IPv6addressVariation3(reader) ||
+        IPv6addressVariation4(reader) ||
+        IPv6addressVariation5(reader) ||
+        IPv6addressVariation6(reader) ||
+        IPv6addressVariation7(reader) ||
+        IPv6addressVariation8(reader) ||
+        IPv6addressVariation9(reader)) {
         return true;
     }
 

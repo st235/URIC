@@ -41,7 +41,7 @@ bool IPLiteral(TokenReader& reader);
 
 bool IPvFuture(TokenReader& reader);
 
-bool IPv6Address(TokenReader& reader);
+bool IPv6address(TokenReader& reader);
 
 bool h16(TokenReader& reader);
 
