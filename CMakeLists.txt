@@ -39,6 +39,16 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(uric_tests
+  # Parser tests.
+  tests/uri_parser_validation_decOctet.cpp
+  tests/uri_parser_validation_pathAbempty.cpp
+  tests/uri_parser_validation_pchar.cpp
+  tests/uri_parser_validation_pctEncoded.cpp
+  tests/uri_parser_validation_queryFragment.cpp
+  tests/uri_parser_validation_segment.cpp
+  tests/uri_parser_validation_segmentNz.cpp
+  tests/uri_parser_validation_segmentNzNc.cpp
+
   tests/uri_tests.cpp
   tests/uri_parser_tests.cpp
 )

@@ -5,7 +5,7 @@
 namespace {
 
 bool IsAlpha(char c) {
-    return (c >= 'a' && c <= 'z') || (c >= 'A' || c <= 'Z');
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
 bool IsDigit(char c) {
@@ -954,7 +954,6 @@ bool segmentNzNc(TokenReader& reader) {
     while(ConsumeUnreserved(reader) ||
           pctEncoded(reader) ||
           ConsumeSubDelims(reader) ||
-          reader.consume(':') ||
           reader.consume('@')) {
         counter += 1;
     }
@@ -970,12 +969,6 @@ bool segmentNzNc(TokenReader& reader) {
 bool pchar(TokenReader& reader) {
     auto token = reader.save();
 
-    return false;
-}
-
-bool queryFragment(TokenReader& reader) {
-    auto token = reader.save();
-
     if (ConsumeUnreserved(reader) ||
         pctEncoded(reader) ||
         ConsumeSubDelims(reader) ||
@@ -986,6 +979,17 @@ bool queryFragment(TokenReader& reader) {
 
     reader.restore(token);
     return false;
+}
+
+bool queryFragment(TokenReader& reader) {
+    auto token = reader.save();
+
+    while (pchar(reader) ||
+        reader.consume('/') ||
+        reader.consume('?')) {
+    }
+
+    return true;
 }
 
 bool pctEncoded(TokenReader& reader) {
