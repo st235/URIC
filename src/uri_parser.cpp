@@ -108,16 +108,17 @@ bool uri(TokenReader& reader) {
     auto token = reader.save();
 
     if (scheme(reader) && reader.consume(':') && hierPart(reader)) {
+        auto optional1_token = reader.save();
         if (reader.consume('?')) {
             if (!queryFragment(reader)) {
-                reader.restore(token);
-                return false;
+                reader.restore(optional1_token);
             }
         }
+
+        auto optional2_token = reader.save();
         if (reader.consume('#')) {
             if (!queryFragment(reader)) {
-                reader.restore(token);
-                return false;
+                reader.restore(optional2_token);
             }
         }
 
@@ -131,7 +132,7 @@ bool uri(TokenReader& reader) {
 bool hierPart(TokenReader& reader) {
     auto token = reader.save();
 
-    if (reader.consumeAll("//") && pathAbempty(reader)) {
+    if (reader.consumeAll("//") && authority(reader) && pathAbempty(reader)) {
         return true;
     }
 
@@ -174,10 +175,10 @@ bool absoluteUri(TokenReader& reader) {
     auto token = reader.save();
 
     if (scheme(reader) && reader.consume(':') && hierPart(reader)) {
+        auto optional1_token = reader.save();
         if (reader.consume('?')) {
             if (!queryFragment(reader)) {
-                reader.restore(token);
-                return false;
+                reader.restore(optional1_token);
             }
         }
 
@@ -196,16 +197,17 @@ bool relativeRef(TokenReader& reader) {
         return false;
     }
 
+    auto optional1_token = reader.save();
     if (reader.consume('?')) {
         if (!queryFragment(reader)) {
-            reader.restore(token);
-            return false;
+            reader.restore(optional1_token);
         }
     }
+
+    auto optional2_token = reader.save();
     if (reader.consume('#')) {
         if (!queryFragment(reader)) {
-            reader.restore(token);
-            return false;
+            reader.restore(optional2_token);
         }
     }
 
@@ -215,7 +217,7 @@ bool relativeRef(TokenReader& reader) {
 bool relativePart(TokenReader& reader) {
     auto token = reader.save();
 
-    if (reader.consumeAll("//") && pathAbempty(reader)) {
+    if (reader.consumeAll("//") && authority(reader) && pathAbempty(reader)) {
         return true;
     }
 
@@ -263,7 +265,6 @@ bool authority(TokenReader& reader) {
     if (userInfo(reader)) {
         if (!reader.consume('@')) {
             reader.restore(token);
-            return false;
         }
     }
 
@@ -272,10 +273,10 @@ bool authority(TokenReader& reader) {
         return false;
     }
 
+    auto option2_token = reader.save();
     if (reader.consume(':')) {
         if (!port(reader)) {
-            reader.restore(token);
-            return false;
+            reader.restore(option2_token);
         }
     }
 

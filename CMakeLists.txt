@@ -40,8 +40,11 @@ enable_testing()
 
 add_executable(uric_tests
   # Parser tests.
+  tests/uri_parser_validation_authority.cpp
   tests/uri_parser_validation_decOctet.cpp
   tests/uri_parser_validation_h16.cpp
+  tests/uri_parser_validation_hierPart.cpp
+  tests/uri_parser_validation_host.cpp
   tests/uri_parser_validation_IPLiteral.cpp
   tests/uri_parser_validation_IPv4address.cpp
   tests/uri_parser_validation_IPv6address.cpp
@@ -55,11 +58,16 @@ add_executable(uric_tests
   tests/uri_parser_validation_pathRootless.cpp
   tests/uri_parser_validation_pchar.cpp
   tests/uri_parser_validation_pctEncoded.cpp
+  tests/uri_parser_validation_port.cpp
   tests/uri_parser_validation_queryFragment.cpp
   tests/uri_parser_validation_regName.cpp
+  tests/uri_parser_validation_relativePart.cpp
+  tests/uri_parser_validation_relativeRef.cpp
+  tests/uri_parser_validation_scheme.cpp
   tests/uri_parser_validation_segment.cpp
   tests/uri_parser_validation_segmentNz.cpp
   tests/uri_parser_validation_segmentNzNc.cpp
+  tests/uri_parser_validation_userInfo.cpp
 
   tests/uri_tests.cpp
   tests/uri_parser_tests.cpp
