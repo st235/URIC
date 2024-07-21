@@ -829,14 +829,25 @@ bool regName(TokenReader& reader) {
     return true;
 }
 
+// Path is not used in RFC3986 directly,
+// therefore this is a high level defition.
+// It is possible to rewrite the rule to
+// match the entire string.
+// Original rule is:
+// path = path-abempty    ; begins with "/" or is empty
+//      / path-absolute   ; begins with "/" but not "//"
+//      / path-noscheme   ; begins with a non-colon segment
+//      / path-rootless   ; begins with a segment
+//      / path-empty      ; zero characters
 bool path(TokenReader& reader) {
     auto token = reader.save();
 
-    if (pathAbempty(reader) ||
-        pathAbsolute(reader) ||
-        pathNoscheme(reader) ||
-        pathRootless(reader) ||
-        pathEmpty(reader)) {
+    if ((pathAbsolute(reader) && !reader.hasNext()) ||
+        (pathNoscheme(reader) && !reader.hasNext()) ||
+        (pathRootless(reader) && !reader.hasNext()) ||
+        // Path abempty and empty equal to each other in case
+        // of an empty string. Path-empty is neglected in this case.
+        (pathAbempty(reader) && !reader.hasNext())) {
         return true;
     }
 
@@ -921,7 +932,7 @@ bool pathRootless(TokenReader& reader) {
 
 bool pathEmpty(TokenReader& reader) {
     // Always returns true as consumes 0 elements.
-    // RFC3986: zero characters
+    // RFC3986: zero characters.
     return true;
 }
 

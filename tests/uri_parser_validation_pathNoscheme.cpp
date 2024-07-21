@@ -22,6 +22,7 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_pair("/c2\%20", false),
             std::make_pair("/ab0/aaa/swes", false),
             std::make_pair("/a_b0/a21\%20a/", false),
+            std::make_pair("//", false),
 
             std::make_pair("0", true),
             std::make_pair("ab", true),
