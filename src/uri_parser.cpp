@@ -41,7 +41,7 @@ bool IsUnreserved(char c) {
            (c == '_') || (c == '~');
 }
 
-bool ConsumeAlpha(TokenReader& reader) {
+bool ConsumeAlpha(uri::__internal::TokenReader& reader) {
     if (IsAlpha(reader.peek())) {
         reader.next();
         return true;
@@ -49,7 +49,7 @@ bool ConsumeAlpha(TokenReader& reader) {
     return false;
 }
 
-bool ConsumeDigit(TokenReader& reader) {
+bool ConsumeDigit(uri::__internal::TokenReader& reader) {
     if (IsDigit(reader.peek())) {
         reader.next();
         return true;
@@ -57,7 +57,7 @@ bool ConsumeDigit(TokenReader& reader) {
     return false;
 }
 
-bool ConsumeHexDigit(TokenReader& reader) {
+bool ConsumeHexDigit(uri::__internal::TokenReader& reader) {
     if (IsHexDigit(reader.peek())) {
         reader.next();
         return true;
@@ -65,7 +65,7 @@ bool ConsumeHexDigit(TokenReader& reader) {
     return false;
 }
 
-bool ConsumeSubDelims(TokenReader& reader) {
+bool ConsumeSubDelims(uri::__internal::TokenReader& reader) {
     if (IsSubDelims(reader.peek())) {
         reader.next();
         return true;
@@ -73,7 +73,7 @@ bool ConsumeSubDelims(TokenReader& reader) {
     return false;
 }
 
-bool ConsumeGenDelims(TokenReader& reader) {
+bool ConsumeGenDelims(uri::__internal::TokenReader& reader) {
     if (IsGenDelims(reader.peek())) {
         reader.next();
         return true;
@@ -81,7 +81,7 @@ bool ConsumeGenDelims(TokenReader& reader) {
     return false;
 }
 
-bool ConsumeReserved(TokenReader& reader) {
+bool ConsumeReserved(uri::__internal::TokenReader& reader) {
     if (IsReserved(reader.peek())) {
         reader.next();
         return true;
@@ -89,7 +89,7 @@ bool ConsumeReserved(TokenReader& reader) {
     return false;
 }
 
-bool ConsumeUnreserved(TokenReader& reader) {
+bool ConsumeUnreserved(uri::__internal::TokenReader& reader) {
     if (IsUnreserved(reader.peek())) {
         reader.next();
         return true;
@@ -822,7 +822,7 @@ bool regName(TokenReader& reader) {
     auto token = reader.save();
 
     while (ConsumeUnreserved(reader) ||
-           pctEncoded(read) ||
+           pctEncoded(reader) ||
            ConsumeSubDelims(reader)) {
     }
 
