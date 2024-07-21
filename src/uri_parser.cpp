@@ -122,6 +122,49 @@ bool uri(TokenReader& reader) {
             }
         }
 
+        if (reader.hasNext()) {
+            reader.restore(token);
+            return false;
+        }
+
+        return true;
+    }
+
+    reader.restore(token);
+    return false;
+}
+
+bool uriReference(TokenReader& reader) {
+    auto token = reader.save();
+
+    if (uri(reader) || relativeRef(reader)) {
+        if (reader.hasNext()) {
+            reader.restore(token);
+            return false;
+        }
+        return true;
+    }
+
+    reader.restore(token);
+    return false;
+}
+
+bool absoluteUri(TokenReader& reader) {
+    auto token = reader.save();
+
+    if (scheme(reader) && reader.consume(':') && hierPart(reader)) {
+        auto optional1_token = reader.save();
+        if (reader.consume('?')) {
+            if (!queryFragment(reader)) {
+                reader.restore(optional1_token);
+            }
+        }
+
+        if (reader.hasNext()) {
+            reader.restore(token);
+            return false;
+        }
+
         return true;
     }
 
@@ -148,40 +191,6 @@ bool hierPart(TokenReader& reader) {
 
     reader.restore(token);
     if (pathEmpty(reader)) {
-        return true;
-    }
-
-    reader.restore(token);
-    return false;
-}
-
-bool uriReference(TokenReader& reader) {
-    auto token = reader.save();
-
-    if (uri(reader)) {
-        return true;
-    }
-
-    reader.restore(token);
-    if (relativeRef(reader)) {
-        return true;
-    }
-
-    reader.restore(token);
-    return false;
-}
-
-bool absoluteUri(TokenReader& reader) {
-    auto token = reader.save();
-
-    if (scheme(reader) && reader.consume(':') && hierPart(reader)) {
-        auto optional1_token = reader.save();
-        if (reader.consume('?')) {
-            if (!queryFragment(reader)) {
-                reader.restore(optional1_token);
-            }
-        }
-
         return true;
     }
 
