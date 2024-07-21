@@ -1,0 +1,27 @@
+name: build-and-run-tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+
+jobs:
+  build-and-test-project:
+    name: Build Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+
+      - name: Configure and Build Project
+        uses: threeal/cmake-action@main
+        with:
+          source-dir: ${{github.workspace}}
+          build-dir: ${{github.workspace}}/build/
+          options: ASSERT=ON
+
+      - name: Run tests
+        working-directory: ${{github.workspace}}/build/
+        run: |
+          ctest --output-on-failure
