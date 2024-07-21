@@ -7,6 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(uric INTERFACE)
 
+target_sources(uric INTERFACE
+  # Token reader.
+  src/token_reader.h
+  # Uri parser.
+  src/uri_parser.h
+  src/uri_parser.cpp
+)
 target_include_directories(uric INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 #  Enable all possible warnings and treat them as errors.
@@ -33,9 +40,12 @@ enable_testing()
 
 add_executable(uric_tests
   tests/uri_tests.cpp
+  tests/uri_parser_tests.cpp
 )
 
 target_link_libraries(uric_tests PRIVATE uric)
+target_include_directories(uric_tests PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
+
 target_link_libraries(uric_tests PRIVATE GTest::gtest_main)
 
 include(GoogleTest)
