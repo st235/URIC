@@ -317,7 +317,7 @@ bool relativePart(TokenReader& reader) {
     }
 
     reader.restore(token);
-    if (pathRootless(reader)) {
+    if (pathNoscheme(reader)) {
         return true;
     }
 

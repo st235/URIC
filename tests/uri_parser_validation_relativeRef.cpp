@@ -14,6 +14,13 @@ INSTANTIATE_TEST_SUITE_P(
         UriParserRelativeRefTests,
         UriParserRelativeRefTestingFixture,
         ::testing::Values(
+            // Should be parsed as path-rootless.
+            std::make_pair("://localhost:8080", false),
+            // No column symbols in relative-ref.
+            std::make_pair("site.co.uk:3036", false),
+            std::make_pair("site.co.uk:3036/", false),
+            std::make_pair("github:st235@website.com/some_path", false),
+
             std::make_pair("", true),
             std::make_pair("//", true),
             std::make_pair("//localhost:8080", true),
@@ -29,11 +36,6 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_pair("/site.co.uk:3036", true),
             std::make_pair("/site.co.uk:3036/", true),
             std::make_pair("/github:st235@website.com/some_path", true),
-            std::make_pair("site.co.uk:3036", true),
-            std::make_pair("site.co.uk:3036/", true),
-            std::make_pair("github:st235@website.com/some_path", true),
-            // Should be parsed as path-rootless.
-            std::make_pair("://localhost:8080", true),
             std::make_pair("st235.me/about/early-career", true)
         )
 );
