@@ -332,13 +332,17 @@ bool relativePart(TokenReader& reader) {
 
 bool authority(TokenReader& reader) {
     // TODO(st235): remove.
+    std::optional<std::string> userInfo_value;
     std::optional<std::string> host_value;
     std::optional<std::string> port_value;
 
     auto token = reader.save();
 
-    if (userInfo(reader)) {
+    if (userInfo(reader, userInfo_value)) {
         if (!reader.consume('@')) {
+            // If no @ matched, no
+            // user info should be returned.
+            userInfo_value = std::nullopt;
             reader.restore(token);
         }
     }
@@ -358,13 +362,16 @@ bool authority(TokenReader& reader) {
     return true;
 }
 
-bool userInfo(TokenReader& reader) {
+bool userInfo(TokenReader& reader,
+              std::optional<std::string>& value) {
+    value = std::nullopt;
     auto token = reader.save();
 
     while (ConsumeUnreserved(reader) || pctEncoded(reader)
         || ConsumeSubDelims(reader) || reader.consume(':')) {
     }
 
+    value = reader.extract(token);
     return true;
 }
 

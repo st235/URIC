@@ -46,7 +46,8 @@ bool relativePart(TokenReader& reader);
 
 bool authority(TokenReader& reader);
 
-bool userInfo(TokenReader& reader);
+bool userInfo(TokenReader& reader,
+              std::optional<std::string>& value);
 
 bool port(TokenReader& reader,
           std::optional<std::string>& value);
