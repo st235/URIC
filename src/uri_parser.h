@@ -48,7 +48,8 @@ bool authority(TokenReader& reader);
 
 bool userInfo(TokenReader& reader);
 
-bool port(TokenReader& reader);
+bool port(TokenReader& reader,
+          std::optional<std::string>& value);
 
 bool IPLiteral(TokenReader& reader,
                std::optional<std::string>& value);

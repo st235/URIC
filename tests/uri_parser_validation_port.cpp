@@ -5,39 +5,48 @@
 
 #include "token_reader.h"
 #include "uri_parser.h"
+#include "utils/parser_test_utils.h"
 
-using ValidationData = std::pair<std::string, bool>;
+using tests::ParserTestPayload;
 
-class UriParserPortTestingFixture: public ::testing::TestWithParam<ValidationData> {};
+class UriParserPortTestingFixture: public ::testing::TestWithParam<ParserTestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParserPortTests,
         UriParserPortTestingFixture,
         ::testing::Values(
-            std::make_pair("AAAAA", false),
-            std::make_pair("G", false),
+            ParserTestPayload::error("AAAAA"),
+            ParserTestPayload::error("G"),
 
-            std::make_pair("", true),
-            std::make_pair("1", true),
-            std::make_pair("18", true),
-            std::make_pair("80", true),
-            std::make_pair("3036", true),
-            std::make_pair("8080", true),
-            std::make_pair("21", true),
-            std::make_pair("22", true),
-            std::make_pair("23", true),
-            std::make_pair("143", true),
-            std::make_pair("443", true),
-            std::make_pair("20", true)
+            ParserTestPayload::success(""),
+            ParserTestPayload::success("1"),
+            ParserTestPayload::success("18"),
+            ParserTestPayload::success("80"),
+            ParserTestPayload::success("3036"),
+            ParserTestPayload::success("8080"),
+            ParserTestPayload::success("21"),
+            ParserTestPayload::success("22"),
+            ParserTestPayload::success("23"),
+            ParserTestPayload::success("143"),
+            ParserTestPayload::success("443"),
+            ParserTestPayload::success("20")
         )
 );
 
 TEST_P(UriParserPortTestingFixture, TestThatPortParsingIsCorrect) {
-    const auto& pair = GetParam();
+    const auto& validation_data = GetParam();
 
-    const auto& text = pair.first;
-    const auto& expected_result = pair.second;
+    const auto& original_text = validation_data.original_text;
+    const auto& expected_status = validation_data.expected_status;
+    const auto& expected_text = validation_data.expected_text;
 
-    uri::__internal::TokenReader reader(text);
-    EXPECT_EQ(uri::__internal::port(reader) && !reader.hasNext(), expected_result);
+    std::optional<std::string> parsed_value;
+    uri::__internal::TokenReader reader(original_text);
+
+    EXPECT_EQ(uri::__internal::port(reader, parsed_value) && !reader.hasNext(), expected_status);
+
+    // Check only fully matched inputs.
+    if (!reader.hasNext()) {
+        EXPECT_EQ(parsed_value, expected_text);
+    }
 }

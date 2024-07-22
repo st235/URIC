@@ -333,6 +333,7 @@ bool relativePart(TokenReader& reader) {
 bool authority(TokenReader& reader) {
     // TODO(st235): remove.
     std::optional<std::string> host_value;
+    std::optional<std::string> port_value;
 
     auto token = reader.save();
 
@@ -349,7 +350,7 @@ bool authority(TokenReader& reader) {
 
     auto option2_token = reader.save();
     if (reader.consume(':')) {
-        if (!port(reader)) {
+        if (!port(reader, port_value)) {
             reader.restore(option2_token);
         }
     }
@@ -381,13 +382,16 @@ bool host(TokenReader& reader,
     return false;
 }
 
-bool port(TokenReader& reader) {
+bool port(TokenReader& reader,
+          std::optional<std::string>& value) {
+    value = std::nullopt;
     auto token = reader.save();
 
     while (IsDigit(reader.peek())) {
         reader.next();
     }
 
+    value = reader.extract(token);
     return true;
 }
 
