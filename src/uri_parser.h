@@ -15,13 +15,24 @@ class TokenReader;
 // TODO(st235): leave only public API in header.
 // TODO(st235): collapse similar rules.
 
-bool uri(TokenReader& reader);
-
-bool hierPart(TokenReader& reader);
+// Entry-point tokens.
+// These tokens expect to match the
+// entire string: from the begging till the end.
 
 bool uriReference(TokenReader& reader);
 
+bool uri(TokenReader& reader);
+
 bool absoluteUri(TokenReader& reader);
+
+bool path(TokenReader& reader);
+
+// Internal tokens (sorted by importance).
+
+bool queryFragment(TokenReader& reader,
+                   std::optional<std::string>& value);
+
+bool hierPart(TokenReader& reader);
 
 bool relativeRef(TokenReader& reader);
 
@@ -53,8 +64,6 @@ bool decOctet(TokenReader& reader);
 
 bool regName(TokenReader& reader);
 
-bool path(TokenReader& reader);
-
 bool pathAbempty(TokenReader& reader);
 
 bool pathAbsolute(TokenReader& reader);
@@ -72,8 +81,6 @@ bool segmentNz(TokenReader& reader);
 bool segmentNzNc(TokenReader& reader);
 
 bool pchar(TokenReader& reader);
-
-bool queryFragment(TokenReader& reader);
 
 bool pctEncoded(TokenReader& reader);
 

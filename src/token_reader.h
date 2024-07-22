@@ -14,21 +14,21 @@ class TokenReader {
 
     static inline constexpr char TOKEN_EOF = 0;
 
-    explicit TokenReader(const std::string& raw_json):
+    explicit TokenReader(const std::string& raw_text):
         _index(0),
-        _raw_json(raw_json) {
+        _raw_text(raw_text) {
         // Empty on purpose.
     }
 
     TokenReader(const TokenReader& that) {
         this->_index = that._index;
-        this->_raw_json = that._raw_json;
+        this->_raw_text = that._raw_text;
     }
 
     TokenReader& operator=(const TokenReader& that) {
         if (this != &that) {
             this->_index = that._index;
-            this->_raw_json = that._raw_json;
+            this->_raw_text = that._raw_text;
         }
 
         return *this;
@@ -36,16 +36,26 @@ class TokenReader {
 
     TokenReader(TokenReader&& that) noexcept {
         this->_index = that._index;
-        this->_raw_json = std::move(that._raw_json);
+        this->_raw_text = std::move(that._raw_text);
     }
 
     TokenReader& operator=(TokenReader&& that) noexcept {
         if (this != &that) {
             this->_index = that._index;
-            this->_raw_json = std::move(that._raw_json);
+            this->_raw_text = std::move(that._raw_text);
         }
 
         return *this;
+    }
+
+    std::string extract(token_t start) const {
+        token_t current = save();
+
+        if (current <= start) {
+            return "";
+        }
+
+        return _raw_text.substr(start, current - start);
     }
 
     inline token_t save() const {
@@ -57,7 +67,7 @@ class TokenReader {
     }
 
     inline bool hasNext() const {
-        return _index < _raw_json.length();
+        return _index < _raw_text.length();
     }
 
     char next() {
@@ -94,13 +104,13 @@ class TokenReader {
             return TOKEN_EOF;
         }
 
-        return _raw_json[_index];
+        return _raw_text[_index];
     }
 
     ~TokenReader() = default;
   private:
     size_t _index;
-    std::string _raw_json;
+    std::string _raw_text;
 };
 
 } // namespace __internal

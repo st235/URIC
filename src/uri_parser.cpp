@@ -104,20 +104,39 @@ namespace uri {
 
 namespace __internal {
 
+bool uriReference(TokenReader& reader) {
+    auto token = reader.save();
+
+    if (uri(reader) || relativeRef(reader)) {
+        if (reader.hasNext()) {
+            reader.restore(token);
+            return false;
+        }
+        return true;
+    }
+
+    reader.restore(token);
+    return false;
+}
+
 bool uri(TokenReader& reader) {
+    // TODO(st235): remove.
+    std::optional<std::string> query;
+    std::optional<std::string> fragment;
+
     auto token = reader.save();
 
     if (scheme(reader) && reader.consume(':') && hierPart(reader)) {
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
-            if (!queryFragment(reader)) {
+            if (!queryFragment(reader, query)) {
                 reader.restore(optional1_token);
             }
         }
 
         auto optional2_token = reader.save();
         if (reader.consume('#')) {
-            if (!queryFragment(reader)) {
+            if (!queryFragment(reader, fragment)) {
                 reader.restore(optional2_token);
             }
         }
@@ -134,28 +153,16 @@ bool uri(TokenReader& reader) {
     return false;
 }
 
-bool uriReference(TokenReader& reader) {
-    auto token = reader.save();
-
-    if (uri(reader) || relativeRef(reader)) {
-        if (reader.hasNext()) {
-            reader.restore(token);
-            return false;
-        }
-        return true;
-    }
-
-    reader.restore(token);
-    return false;
-}
-
 bool absoluteUri(TokenReader& reader) {
+    // TODO(st235): remove.
+    std::optional<std::string> query;
+
     auto token = reader.save();
 
     if (scheme(reader) && reader.consume(':') && hierPart(reader)) {
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
-            if (!queryFragment(reader)) {
+            if (!queryFragment(reader, query)) {
                 reader.restore(optional1_token);
             }
         }
@@ -170,6 +177,46 @@ bool absoluteUri(TokenReader& reader) {
 
     reader.restore(token);
     return false;
+}
+
+// Path is not used in RFC3986 directly,
+// therefore this is a high level defition.
+// It is possible to rewrite the rule to
+// match the entire string.
+// Original rule is:
+// path = path-abempty    ; begins with "/" or is empty
+//      / path-absolute   ; begins with "/" but not "//"
+//      / path-noscheme   ; begins with a non-colon segment
+//      / path-rootless   ; begins with a segment
+//      / path-empty      ; zero characters
+bool path(TokenReader& reader) {
+    auto token = reader.save();
+
+    if ((pathAbsolute(reader) && !reader.hasNext()) ||
+        (pathNoscheme(reader) && !reader.hasNext()) ||
+        (pathRootless(reader) && !reader.hasNext()) ||
+        // Path abempty and empty equal to each other in case
+        // of an empty string. Path-empty is neglected in this case.
+        (pathAbempty(reader) && !reader.hasNext())) {
+        return true;
+    }
+
+    reader.restore(token);
+    return false;
+}
+
+bool queryFragment(TokenReader& reader,
+                   std::optional<std::string>& value) {
+    value = std::nullopt;
+    auto token = reader.save();
+
+    while (pchar(reader) ||
+        reader.consume('/') ||
+        reader.consume('?')) {
+    }
+
+    value = reader.extract(token);
+    return true;
 }
 
 bool hierPart(TokenReader& reader) {
@@ -199,6 +246,10 @@ bool hierPart(TokenReader& reader) {
 }
 
 bool relativeRef(TokenReader& reader) {
+    // TODO(st235): remove.
+    std::optional<std::string> query;
+    std::optional<std::string> fragment;
+
     auto token = reader.save();
 
     if (!relativePart(reader)) {
@@ -208,14 +259,14 @@ bool relativeRef(TokenReader& reader) {
 
     auto optional1_token = reader.save();
     if (reader.consume('?')) {
-        if (!queryFragment(reader)) {
+        if (!queryFragment(reader, query)) {
             reader.restore(optional1_token);
         }
     }
 
     auto optional2_token = reader.save();
     if (reader.consume('#')) {
-        if (!queryFragment(reader)) {
+        if (!queryFragment(reader, fragment)) {
             reader.restore(optional2_token);
         }
     }
@@ -835,32 +886,6 @@ bool regName(TokenReader& reader) {
     return true;
 }
 
-// Path is not used in RFC3986 directly,
-// therefore this is a high level defition.
-// It is possible to rewrite the rule to
-// match the entire string.
-// Original rule is:
-// path = path-abempty    ; begins with "/" or is empty
-//      / path-absolute   ; begins with "/" but not "//"
-//      / path-noscheme   ; begins with a non-colon segment
-//      / path-rootless   ; begins with a segment
-//      / path-empty      ; zero characters
-bool path(TokenReader& reader) {
-    auto token = reader.save();
-
-    if ((pathAbsolute(reader) && !reader.hasNext()) ||
-        (pathNoscheme(reader) && !reader.hasNext()) ||
-        (pathRootless(reader) && !reader.hasNext()) ||
-        // Path abempty and empty equal to each other in case
-        // of an empty string. Path-empty is neglected in this case.
-        (pathAbempty(reader) && !reader.hasNext())) {
-        return true;
-    }
-
-    reader.restore(token);
-    return false;
-}
-
 bool pathOptionalSegment(TokenReader& reader) {
     auto token = reader.save();
 
@@ -996,17 +1021,6 @@ bool pchar(TokenReader& reader) {
 
     reader.restore(token);
     return false;
-}
-
-bool queryFragment(TokenReader& reader) {
-    auto token = reader.save();
-
-    while (pchar(reader) ||
-        reader.consume('/') ||
-        reader.consume('?')) {
-    }
-
-    return true;
 }
 
 bool pctEncoded(TokenReader& reader) {

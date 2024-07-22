@@ -17,6 +17,7 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_pair("", false),
             std::make_pair("0", false),
             std::make_pair("a/sdas", false),
+            std::make_pair("//", false),
 
             std::make_pair("/", true),
             std::make_pair("/a", true),
