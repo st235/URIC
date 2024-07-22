@@ -5,41 +5,50 @@
 
 #include "token_reader.h"
 #include "uri_parser.h"
+#include "utils/parser_test_utils.h"
 
-using ValidationData = std::pair<std::string, bool>;
+using tests::ParserTestPayload;
 
-class UriParserPathAbemptyTestingFixture: public ::testing::TestWithParam<ValidationData> {};
+class UriParserPathAbemptyTestingFixture: public ::testing::TestWithParam<ParserTestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParserPathAbemptyTests,
         UriParserPathAbemptyTestingFixture,
         ::testing::Values(
-            std::make_pair("abc", false),
-            std::make_pair("?", false),
-            std::make_pair("#abc", false),
-            std::make_pair("abc/hello", false),
-            std::make_pair("0/hello", false),
+            ParserTestPayload::error("abc"),
+            ParserTestPayload::error("?"),
+            ParserTestPayload::error("#abc"),
+            ParserTestPayload::error("abc/hello"),
+            ParserTestPayload::error("0/hello"),
 
-            std::make_pair("", true),
-            std::make_pair("/hello/world", true),
-            std::make_pair("/hello/world/", true),
-            std::make_pair("/hello1//world/2", true),
-            std::make_pair("/1/2/3/4/5/6/7/8", true),
-            std::make_pair("/", true),
-            std::make_pair("//", true),
-            std::make_pair("//hello/world", true),
-            std::make_pair("/hello_world", true),
-            std::make_pair("/hello-world", true),
-            std::make_pair("/hello=world", true)
+            ParserTestPayload::success(""),
+            ParserTestPayload::success("/hello/world"),
+            ParserTestPayload::success("/hello/world/"),
+            ParserTestPayload::success("/hello1//world/2"),
+            ParserTestPayload::success("/1/2/3/4/5/6/7/8"),
+            ParserTestPayload::success("/"),
+            ParserTestPayload::success("//"),
+            ParserTestPayload::success("//hello/world"),
+            ParserTestPayload::success("/hello_world"),
+            ParserTestPayload::success("/hello-world"),
+            ParserTestPayload::success("/hello=world")
         )
 );
 
 TEST_P(UriParserPathAbemptyTestingFixture, TestThatPathAbemptyParsingIsCorrect) {
-    const auto& pair = GetParam();
+    const auto& validation_data = GetParam();
 
-    const auto& text = pair.first;
-    const auto& expected_result = pair.second;
+    const auto& original_text = validation_data.original_text;
+    const auto& expected_status = validation_data.expected_status;
+    const auto& expected_text = validation_data.expected_text;
 
-    uri::__internal::TokenReader reader(text);
-    EXPECT_EQ(uri::__internal::pathAbempty(reader) && !reader.hasNext(), expected_result);
+    std::optional<std::string> parsed_value;
+    uri::__internal::TokenReader reader(original_text);
+
+    EXPECT_EQ(uri::__internal::pathAbempty(reader, parsed_value) && !reader.hasNext(), expected_status);
+
+    // Check only fully matched inputs.
+    if (!reader.hasNext()) {
+        EXPECT_EQ(parsed_value, expected_text);
+    }
 }

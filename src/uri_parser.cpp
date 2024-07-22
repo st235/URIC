@@ -195,18 +195,32 @@ bool absoluteUri(TokenReader& reader) {
 //      / path-noscheme   ; begins with a non-colon segment
 //      / path-rootless   ; begins with a segment
 //      / path-empty      ; zero characters
-bool path(TokenReader& reader) {
+bool path(TokenReader& reader,
+          std::optional<std::string>& value) {
     auto token = reader.save();
 
-    if ((pathAbsolute(reader) && !reader.hasNext()) ||
-        (pathNoscheme(reader) && !reader.hasNext()) ||
-        (pathRootless(reader) && !reader.hasNext()) ||
-        // Path abempty and empty equal to each other in case
-        // of an empty string. Path-empty is neglected in this case.
-        (pathAbempty(reader) && !reader.hasNext())) {
+    if (pathAbsolute(reader, value) && !reader.hasNext()) {
         return true;
     }
 
+    reader.restore(token);
+    if (pathNoscheme(reader, value) && !reader.hasNext()) {
+    return true;
+    }
+
+    reader.restore(token);
+    if (pathRootless(reader, value) && !reader.hasNext()) {
+    return true;
+    }
+
+    // Path abempty and empty equal to each other in case
+    // of an empty string. Path-empty is neglected in this case.
+    reader.restore(token);
+    if (pathAbempty(reader, value) && !reader.hasNext()) {
+    return true;
+    }
+
+    value = std::nullopt;
     reader.restore(token);
     return false;
 }
@@ -250,24 +264,29 @@ bool queryFragment(TokenReader& reader,
 }
 
 bool hierPart(TokenReader& reader) {
+    // TODO(st235): remove.
+    std::optional<std::string> path_value;
+
     auto token = reader.save();
 
-    if (reader.consumeAll("//") && authority(reader) && pathAbempty(reader)) {
+    if (reader.consumeAll("//") &&
+        authority(reader) &&
+        pathAbempty(reader, path_value)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathAbsolute(reader)) {
+    if (pathAbsolute(reader, path_value)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathRootless(reader)) {
+    if (pathRootless(reader, path_value)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathEmpty(reader)) {
+    if (pathEmpty(reader, path_value)) {
         return true;
     }
 
@@ -305,24 +324,29 @@ bool relativeRef(TokenReader& reader) {
 }
 
 bool relativePart(TokenReader& reader) {
+    // TODO(st235): remove.
+    std::optional<std::string> path_value;
+
     auto token = reader.save();
 
-    if (reader.consumeAll("//") && authority(reader) && pathAbempty(reader)) {
+    if (reader.consumeAll("//") &&
+        authority(reader) &&
+        pathAbempty(reader, path_value)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathAbsolute(reader)) {
+    if (pathAbsolute(reader, path_value)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathNoscheme(reader)) {
+    if (pathNoscheme(reader, path_value)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathEmpty(reader)) {
+    if (pathEmpty(reader, path_value)) {
         return true;
     }
 
@@ -919,7 +943,7 @@ bool decOctet(TokenReader& reader) {
     return false;
 }
 
-bool pathOptionalSegment(TokenReader& reader) {
+bool path_optional_segment(TokenReader& reader) {
     auto token = reader.save();
 
     if (!reader.consume('/')) {
@@ -935,12 +959,20 @@ bool pathOptionalSegment(TokenReader& reader) {
     return true;
 }
 
-bool pathAbempty(TokenReader& reader) {
+bool path_kleene_slash_segment(TokenReader& reader) {
+    while (path_optional_segment(reader)) {
+    }
+    return true;
+}
+
+bool pathAbempty(TokenReader& reader,
+                 std::optional<std::string>& value) {
+    value = std::nullopt;
     auto token = reader.save();
 
-    while (pathOptionalSegment(reader)) {
-    }
+    path_kleene_slash_segment(reader);
 
+    value = reader.extract(token);
     return true;
 }
 
@@ -952,7 +984,7 @@ bool pathAbsolute_option1(TokenReader& reader) {
         return false;
     }
 
-    if (!pathAbempty(reader)) {
+    if (!path_kleene_slash_segment(reader)) {
         reader.restore(token);
         return false;
     }
@@ -960,7 +992,9 @@ bool pathAbsolute_option1(TokenReader& reader) {
     return true;
 }
 
-bool pathAbsolute(TokenReader& reader) {
+bool pathAbsolute(TokenReader& reader,
+                  std::optional<std::string>& value) {
+    value = std::nullopt;
     auto token = reader.save();
 
     if (!reader.consume('/')) {
@@ -969,10 +1003,13 @@ bool pathAbsolute(TokenReader& reader) {
     }
 
     pathAbsolute_option1(reader);
+    value = reader.extract(token);
     return true;
 }
 
-bool pathNoscheme(TokenReader& reader) {
+bool pathNoscheme(TokenReader& reader,
+                  std::optional<std::string>& value) {
+    value = std::nullopt;
     auto token = reader.save();
 
     if (!segmentNzNc(reader)) {
@@ -980,10 +1017,14 @@ bool pathNoscheme(TokenReader& reader) {
         return false;
     }
 
-    return pathAbempty(reader);
+    path_kleene_slash_segment(reader);
+    value = reader.extract(token);
+    return true;
 }
 
-bool pathRootless(TokenReader& reader) {
+bool pathRootless(TokenReader& reader,
+                  std::optional<std::string>& value) {
+    value = std::nullopt;
     auto token = reader.save();
 
     if (!segmentNz(reader)) {
@@ -991,12 +1032,16 @@ bool pathRootless(TokenReader& reader) {
         return false;
     }
 
-    return pathAbempty(reader);
+    path_kleene_slash_segment(reader);
+    value = reader.extract(token);
+    return true;
 }
 
-bool pathEmpty(TokenReader& reader) {
-    // Always returns true as consumes 0 elements.
-    // RFC3986: zero characters.
+// Always returns true as consumes 0 elements.
+// RFC3986: zero characters.
+bool pathEmpty(TokenReader& reader,
+               std::optional<std::string>& value) {
+    value = "";
     return true;
 }
 

@@ -25,7 +25,8 @@ bool uri(TokenReader& reader);
 
 bool absoluteUri(TokenReader& reader);
 
-bool path(TokenReader& reader);
+bool path(TokenReader& reader,
+          std::optional<std::string>& value);
 
 // Internal tokens (sorted by importance).
 
@@ -71,15 +72,20 @@ bool ls32(TokenReader& reader);
 
 bool decOctet(TokenReader& reader);
 
-bool pathAbempty(TokenReader& reader);
+bool pathAbempty(TokenReader& reader,
+                 std::optional<std::string>& value);
 
-bool pathAbsolute(TokenReader& reader);
+bool pathAbsolute(TokenReader& reader,
+                  std::optional<std::string>& value);
 
-bool pathNoscheme(TokenReader& reader);
+bool pathNoscheme(TokenReader& reader,
+                  std::optional<std::string>& value);
 
-bool pathRootless(TokenReader& reader);
+bool pathRootless(TokenReader& reader,
+                  std::optional<std::string>& value);
 
-bool pathEmpty(TokenReader& reader);
+bool pathEmpty(TokenReader& reader,
+               std::optional<std::string>& value);
 
 bool segment(TokenReader& reader);
 
