@@ -265,28 +265,31 @@ bool queryFragment(TokenReader& reader,
 
 bool hierPart(TokenReader& reader) {
     // TODO(st235): remove.
-    std::optional<std::string> path_value;
+    std::optional<std::string> valueUserInfo;
+    std::optional<std::string> valueHost;
+    std::optional<std::string> valuePort;
+    std::optional<std::string> valuePath;
 
     auto token = reader.save();
 
     if (reader.consumeAll("//") &&
-        authority(reader) &&
-        pathAbempty(reader, path_value)) {
+        authority(reader, valueUserInfo, valueHost, valuePort) &&
+        pathAbempty(reader, valuePath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathAbsolute(reader, path_value)) {
+    if (pathAbsolute(reader, valuePath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathRootless(reader, path_value)) {
+    if (pathRootless(reader, valuePath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathEmpty(reader, path_value)) {
+    if (pathEmpty(reader, valuePath)) {
         return true;
     }
 
@@ -325,28 +328,31 @@ bool relativeRef(TokenReader& reader) {
 
 bool relativePart(TokenReader& reader) {
     // TODO(st235): remove.
-    std::optional<std::string> path_value;
+    std::optional<std::string> valueUserInfo;
+    std::optional<std::string> valueHost;
+    std::optional<std::string> valuePort;
+    std::optional<std::string> valuePath;
 
     auto token = reader.save();
 
     if (reader.consumeAll("//") &&
-        authority(reader) &&
-        pathAbempty(reader, path_value)) {
+        authority(reader, valueUserInfo, valueHost, valuePort) &&
+        pathAbempty(reader, valuePath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathAbsolute(reader, path_value)) {
+    if (pathAbsolute(reader, valuePath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathNoscheme(reader, path_value)) {
+    if (pathNoscheme(reader, valuePath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathEmpty(reader, path_value)) {
+    if (pathEmpty(reader, valuePath)) {
         return true;
     }
 
@@ -354,31 +360,29 @@ bool relativePart(TokenReader& reader) {
     return false;
 }
 
-bool authority(TokenReader& reader) {
-    // TODO(st235): remove.
-    std::optional<std::string> userInfo_value;
-    std::optional<std::string> host_value;
-    std::optional<std::string> port_value;
-
+bool authority(TokenReader& reader,
+               std::optional<std::string>& valueUserInfo,
+               std::optional<std::string>& valueHost,
+               std::optional<std::string>& valuePort) {
     auto token = reader.save();
 
-    if (userInfo(reader, userInfo_value)) {
+    if (userInfo(reader, valueUserInfo)) {
         if (!reader.consume('@')) {
             // If no @ matched, no
             // user info should be returned.
-            userInfo_value = std::nullopt;
+            valueUserInfo = std::nullopt;
             reader.restore(token);
         }
     }
 
-    if (!host(reader, host_value)) {
+    if (!host(reader, valueHost)) {
         reader.restore(token);
         return false;
     }
 
     auto option2_token = reader.save();
     if (reader.consume(':')) {
-        if (!port(reader, port_value)) {
+        if (!port(reader, valuePort)) {
             reader.restore(option2_token);
         }
     }
