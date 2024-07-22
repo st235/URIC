@@ -49,13 +49,15 @@ class TokenReader {
     }
 
     std::string extract(token_t start) const {
-        token_t current = save();
+        return extract(start, /* end= */ save());
+    }
 
-        if (current <= start) {
+    std::string extract(token_t start, token_t end) const {
+        if (start < 0 || end > _raw_text.length() || end <= start) {
             return "";
         }
 
-        return _raw_text.substr(start, current - start);
+        return _raw_text.substr(start, end - start);
     }
 
     inline token_t save() const {

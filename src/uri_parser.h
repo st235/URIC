@@ -29,6 +29,12 @@ bool path(TokenReader& reader);
 
 // Internal tokens (sorted by importance).
 
+bool scheme(TokenReader& reader,
+            std::optional<std::string>& value);
+
+bool host(TokenReader& reader,
+          std::optional<std::string>& value);
+
 bool queryFragment(TokenReader& reader,
                    std::optional<std::string>& value);
 
@@ -38,17 +44,20 @@ bool relativeRef(TokenReader& reader);
 
 bool relativePart(TokenReader& reader);
 
-bool scheme(TokenReader& reader);
-
 bool authority(TokenReader& reader);
 
 bool userInfo(TokenReader& reader);
 
-bool host(TokenReader& reader);
-
 bool port(TokenReader& reader);
 
-bool IPLiteral(TokenReader& reader);
+bool IPLiteral(TokenReader& reader,
+               std::optional<std::string>& value);
+
+bool IPv4address(TokenReader& reader,
+                 std::optional<std::string>& value);
+
+bool regName(TokenReader& reader,
+             std::optional<std::string>& value);
 
 bool IPvFuture(TokenReader& reader);
 
@@ -58,11 +67,7 @@ bool h16(TokenReader& reader);
 
 bool ls32(TokenReader& reader);
 
-bool IPv4address(TokenReader& reader);
-
 bool decOctet(TokenReader& reader);
-
-bool regName(TokenReader& reader);
 
 bool pathAbempty(TokenReader& reader);
 

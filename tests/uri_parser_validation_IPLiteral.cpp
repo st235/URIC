@@ -5,42 +5,51 @@
 
 #include "token_reader.h"
 #include "uri_parser.h"
+#include "utils/parser_test_utils.h"
 
-using ValidationData = std::pair<std::string, bool>;
+using tests::ParserTestPayload;
 
-class UriParserIPLiteralTestingFixture: public ::testing::TestWithParam<ValidationData> {};
+class UriParserIPLiteralTestingFixture: public ::testing::TestWithParam<ParserTestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParserIPLiteralTests,
         UriParserIPLiteralTestingFixture,
         ::testing::Values(
-            std::make_pair("", false),
-            std::make_pair("a", false),
-            std::make_pair("v.", false),
-            std::make_pair("v1.", false),
-            std::make_pair("v.12345", false),
-            std::make_pair("v4.11:25:]", false),
-            std::make_pair("1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494]", false),
-            std::make_pair("efab:ffac:bd1a:1a71:8fcd::1a8f]", false),
-            std::make_pair("[v4.11:25:", false),
-            std::make_pair("[1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494", false),
-            std::make_pair("[efab:ffac:bd1a:1a71:8fcd::1a8f", false),
+            ParserTestPayload::error(""),
+            ParserTestPayload::error("a"),
+            ParserTestPayload::error("v."),
+            ParserTestPayload::error("v1."),
+            ParserTestPayload::error("v.12345"),
+            ParserTestPayload::error("v4.11:25:]"),
+            ParserTestPayload::error("1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494]"),
+            ParserTestPayload::error("efab:ffac:bd1a:1a71:8fcd::1a8f]"),
+            ParserTestPayload::error("[v4.11:25:"),
+            ParserTestPayload::error("[1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494"),
+            ParserTestPayload::error("[efab:ffac:bd1a:1a71:8fcd::1a8f"),
 
-            std::make_pair("[v4.11]", true),
-            std::make_pair("[v4.11:25]", true),
-            std::make_pair("[v4.11:25:]", true),
-            std::make_pair("[1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494]", true),
-            std::make_pair("[efab:ffac:bd1a:1a71:8fcd::1a8f]", true),
-            std::make_pair("[v77.abz:25:]", true)
+            ParserTestPayload::success("[v4.11]", "v4.11"),
+            ParserTestPayload::success("[v4.11:25]", "v4.11:25"),
+            ParserTestPayload::success("[v4.11:25:]", "v4.11:25:"),
+            ParserTestPayload::success("[1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494]", "1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494"),
+            ParserTestPayload::success("[efab:ffac:bd1a:1a71:8fcd::1a8f]", "efab:ffac:bd1a:1a71:8fcd::1a8f"),
+            ParserTestPayload::success("[v77.abz:25:]", "v77.abz:25:")
         )
 );
 
 TEST_P(UriParserIPLiteralTestingFixture, TestThatIPLiteralParsingIsCorrect) {
-    const auto& pair = GetParam();
+    const auto& validation_data = GetParam();
 
-    const auto& text = pair.first;
-    const auto& expected_result = pair.second;
+    const auto& original_text = validation_data.original_text;
+    const auto& expected_status = validation_data.expected_status;
+    const auto& expected_text = validation_data.expected_text;
 
-    uri::__internal::TokenReader reader(text);
-    EXPECT_EQ(uri::__internal::IPLiteral(reader) && !reader.hasNext(), expected_result);
+    std::optional<std::string> parsed_value;
+    uri::__internal::TokenReader reader(original_text);
+
+    EXPECT_EQ(uri::__internal::IPLiteral(reader, parsed_value) && !reader.hasNext(), expected_status);
+
+    // Check only fully matched inputs.
+    if (!reader.hasNext()) {
+        EXPECT_EQ(parsed_value, expected_text);
+    }
 }

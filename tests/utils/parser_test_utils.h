@@ -18,7 +18,12 @@ struct ParserTestPayload {
     }
 
     static ParserTestPayload success(const std::string& original_text) {
-        return { original_text, true, original_text };
+        return { original_text, true, /* expected_text= */ original_text };
+    }
+
+    static ParserTestPayload success(const std::string& original_text,
+                                     const std::string& expected_text) {
+        return { original_text, true, expected_text };
     }
 };
 

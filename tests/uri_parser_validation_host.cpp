@@ -5,58 +5,67 @@
 
 #include "token_reader.h"
 #include "uri_parser.h"
+#include "utils/parser_test_utils.h"
 
-using ValidationData = std::pair<std::string, bool>;
+using tests::ParserTestPayload;
 
-class UriParserHostTestingFixture: public ::testing::TestWithParam<ValidationData> {};
+class UriParserHostTestingFixture: public ::testing::TestWithParam<ParserTestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParserHostTests,
         UriParserHostTestingFixture,
         ::testing::Values(
-            std::make_pair("v4.11:25:]", false),
-            std::make_pair("1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494]", false),
-            std::make_pair("efab:ffac:bd1a:1a71:8fcd::1a8f]", false),
-            std::make_pair("[v4.11:25:", false),
-            std::make_pair("[1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494", false),
-            std::make_pair("[efab:ffac:bd1a:1a71:8fcd::1a8f", false),
+            ParserTestPayload::error("v4.11:25:]"),
+            ParserTestPayload::error("1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494]"),
+            ParserTestPayload::error("efab:ffac:bd1a:1a71:8fcd::1a8f]"),
+            ParserTestPayload::error("[v4.11:25:"),
+            ParserTestPayload::error("[1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494"),
+            ParserTestPayload::error("[efab:ffac:bd1a:1a71:8fcd::1a8f"),
 
             // IP-literal
-            std::make_pair("[v4.11]", true),
-            std::make_pair("[v4.11:25]", true),
-            std::make_pair("[v4.11:25:]", true),
-            std::make_pair("[1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494]", true),
-            std::make_pair("[efab:ffac:bd1a:1a71:8fcd::1a8f]", true),
-            std::make_pair("[v77.abz:25:]", true),
+            ParserTestPayload::success("[v4.11]", "v4.11"),
+            ParserTestPayload::success("[v4.11:25]", "v4.11:25"),
+            ParserTestPayload::success("[v4.11:25:]", "v4.11:25:"),
+            ParserTestPayload::success("[1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494]", "1fd2:23b4:4c96:1bed:4c89:3f5c:98ed:0494"),
+            ParserTestPayload::success("[efab:ffac:bd1a:1a71:8fcd::1a8f]", "efab:ffac:bd1a:1a71:8fcd::1a8f"),
+            ParserTestPayload::success("[v77.abz:25:]", "v77.abz:25:"),
 
             // IPv4address
-            std::make_pair("82.239.179.164", true),
-            std::make_pair("23.6.209.89", true),
-            std::make_pair("86.143.252.23", true),
-            std::make_pair("124.1.165.76", true),
-            std::make_pair("91.24.186.22", true),
-            std::make_pair("88.36.159.30", true),
-            std::make_pair("24.25.81.113", true),
-            std::make_pair("7.75.209.57", true),
-            std::make_pair("11.6.36.223", true),
-            std::make_pair("233.155.227.64", true),
+            ParserTestPayload::success("82.239.179.164"),
+            ParserTestPayload::success("23.6.209.89"),
+            ParserTestPayload::success("86.143.252.23"),
+            ParserTestPayload::success("124.1.165.76"),
+            ParserTestPayload::success("91.24.186.22"),
+            ParserTestPayload::success("88.36.159.30"),
+            ParserTestPayload::success("24.25.81.113"),
+            ParserTestPayload::success("7.75.209.57"),
+            ParserTestPayload::success("11.6.36.223"),
+            ParserTestPayload::success("233.155.227.64"),
 
             // reg-name
-            std::make_pair("", true),
-            std::make_pair("a", true),
-            std::make_pair("v.", true),
-            std::make_pair("v1.", true),
-            std::make_pair("v.12345", true),
-            std::make_pair("localhost", true)
+            ParserTestPayload::success(""),
+            ParserTestPayload::success("a"),
+            ParserTestPayload::success("v."),
+            ParserTestPayload::success("v1."),
+            ParserTestPayload::success("v.12345"),
+            ParserTestPayload::success("localhost")
         )
 );
 
 TEST_P(UriParserHostTestingFixture, TestThatHostParsingIsCorrect) {
-    const auto& pair = GetParam();
+    const auto& validation_data = GetParam();
 
-    const auto& text = pair.first;
-    const auto& expected_result = pair.second;
+    const auto& original_text = validation_data.original_text;
+    const auto& expected_status = validation_data.expected_status;
+    const auto& expected_text = validation_data.expected_text;
 
-    uri::__internal::TokenReader reader(text);
-    EXPECT_EQ(uri::__internal::host(reader) && !reader.hasNext(), expected_result);
+    std::optional<std::string> parsed_value;
+    uri::__internal::TokenReader reader(original_text);
+
+    EXPECT_EQ(uri::__internal::host(reader, parsed_value) && !reader.hasNext(), expected_status);
+
+    // Check only fully matched inputs.
+    if (!reader.hasNext()) {
+        EXPECT_EQ(parsed_value, expected_text);
+    }
 }

@@ -5,43 +5,52 @@
 
 #include "token_reader.h"
 #include "uri_parser.h"
+#include "utils/parser_test_utils.h"
 
-using ValidationData = std::pair<std::string, bool>;
+using tests::ParserTestPayload;
 
-class UriParserRegNameTestingFixture: public ::testing::TestWithParam<ValidationData> {};
+class UriParserRegNameTestingFixture: public ::testing::TestWithParam<ParserTestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParserRegNameTests,
         UriParserRegNameTestingFixture,
         ::testing::Values(
-            std::make_pair(":", false),
-            std::make_pair("@", false),
-            std::make_pair("abc:sdas", false),
-            std::make_pair("/sdasds", false),
-            std::make_pair("/1b", false),
-            std::make_pair("?q=5", false),
-            std::make_pair("#fragment", false),
-            std::make_pair("[ololo]", false),
-            std::make_pair("@gmail.com", false),
+            ParserTestPayload::error(":"),
+            ParserTestPayload::error("@"),
+            ParserTestPayload::error("abc:sdas"),
+            ParserTestPayload::error("/sdasds"),
+            ParserTestPayload::error("/1b"),
+            ParserTestPayload::error("?q=5"),
+            ParserTestPayload::error("#fragment"),
+            ParserTestPayload::error("[ololo]"),
+            ParserTestPayload::error("@gmail.com"),
 
-            std::make_pair("", true),
-            std::make_pair("0", true),
-            std::make_pair("ab", true),
-            std::make_pair("a.sdas", true),
-            std::make_pair("~echo", true),
-            std::make_pair("1_000_000", true),
-            std::make_pair("(Hello%20world)", true),
-            std::make_pair("q=5&f=7", true),
-            std::make_pair("a01-sdas-bgdf%20", true)
+            ParserTestPayload::success(""),
+            ParserTestPayload::success("0"),
+            ParserTestPayload::success("ab"),
+            ParserTestPayload::success("a.sdas"),
+            ParserTestPayload::success("~echo"),
+            ParserTestPayload::success("1_000_000"),
+            ParserTestPayload::success("(Hello%20world)"),
+            ParserTestPayload::success("q=5&f=7"),
+            ParserTestPayload::success("a01-sdas-bgdf%20")
         )
 );
 
 TEST_P(UriParserRegNameTestingFixture, TestThatRegNameParsingIsCorrect) {
-    const auto& pair = GetParam();
+    const auto& validation_data = GetParam();
 
-    const auto& text = pair.first;
-    const auto& expected_result = pair.second;
+    const auto& original_text = validation_data.original_text;
+    const auto& expected_status = validation_data.expected_status;
+    const auto& expected_text = validation_data.expected_text;
 
-    uri::__internal::TokenReader reader(text);
-    EXPECT_EQ(uri::__internal::regName(reader) && !reader.hasNext(), expected_result);
+    std::optional<std::string> parsed_value;
+    uri::__internal::TokenReader reader(original_text);
+
+    EXPECT_EQ(uri::__internal::regName(reader, parsed_value) && !reader.hasNext(), expected_status);
+
+    // Check only fully matched inputs.
+    if (!reader.hasNext()) {
+        EXPECT_EQ(parsed_value, expected_text);
+    }
 }

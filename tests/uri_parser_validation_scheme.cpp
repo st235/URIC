@@ -5,34 +5,43 @@
 
 #include "token_reader.h"
 #include "uri_parser.h"
+#include "utils/parser_test_utils.h"
 
-using ValidationData = std::pair<std::string, bool>;
+using tests::ParserTestPayload;
 
-class UriParserSchemeTestingFixture: public ::testing::TestWithParam<ValidationData> {};
+class UriParserSchemeTestingFixture: public ::testing::TestWithParam<ParserTestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParserSchemeTests,
         UriParserSchemeTestingFixture,
         ::testing::Values(
-            std::make_pair("", false),
+            ParserTestPayload::error(""),
 
-            std::make_pair("http", true),
-            std::make_pair("https", true),
-            std::make_pair("ws", true),
-            std::make_pair("ssh", true),
-            std::make_pair("mailto", true),
-            std::make_pair("ftp", true),
-            std::make_pair("a+b", true),
-            std::make_pair("a.b", true)
+            ParserTestPayload::success("http"),
+            ParserTestPayload::success("https"),
+            ParserTestPayload::success("ws"),
+            ParserTestPayload::success("ssh"),
+            ParserTestPayload::success("mailto"),
+            ParserTestPayload::success("ftp"),
+            ParserTestPayload::success("a+b"),
+            ParserTestPayload::success("a.b")
         )
 );
 
 TEST_P(UriParserSchemeTestingFixture, TestThatSchemeParsingIsCorrect) {
-    const auto& pair = GetParam();
+    const auto& validation_data = GetParam();
 
-    const auto& text = pair.first;
-    const auto& expected_result = pair.second;
+    const auto& original_text = validation_data.original_text;
+    const auto& expected_status = validation_data.expected_status;
+    const auto& expected_text = validation_data.expected_text;
 
-    uri::__internal::TokenReader reader(text);
-    EXPECT_EQ(uri::__internal::scheme(reader) && !reader.hasNext(), expected_result);
+    std::optional<std::string> parsed_value;
+    uri::__internal::TokenReader reader(original_text);
+
+    EXPECT_EQ(uri::__internal::scheme(reader, parsed_value) && !reader.hasNext(), expected_status);
+
+    // Check only fully matched inputs.
+    if (!reader.hasNext()) {
+        EXPECT_EQ(parsed_value, expected_text);
+    }
 }

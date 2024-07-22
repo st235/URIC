@@ -5,88 +5,97 @@
 
 #include "token_reader.h"
 #include "uri_parser.h"
+#include "utils/parser_test_utils.h"
 
-using ValidationData = std::pair<std::string, bool>;
+using tests::ParserTestPayload;
 
-class UriParserIPv4addressTestingFixture: public ::testing::TestWithParam<ValidationData> {};
+class UriParserIPv4addressTestingFixture: public ::testing::TestWithParam<ParserTestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParserIPv4addressTests,
         UriParserIPv4addressTestingFixture,
         ::testing::Values(
-            std::make_pair("", false),
-            std::make_pair("abcsd", false),
-            std::make_pair("1", false),
-            std::make_pair("1.", false),
-            std::make_pair("1..", false),
-            std::make_pair("1...", false),
-            std::make_pair("1.", false),
-            std::make_pair("1.2.", false),
-            std::make_pair("1.2.3.", false),
-            std::make_pair("256.256.256.256", false),
-            std::make_pair("-1.1.1.1", false),
+            ParserTestPayload::error(""),
+            ParserTestPayload::error("abcsd"),
+            ParserTestPayload::error("1"),
+            ParserTestPayload::error("1."),
+            ParserTestPayload::error("1.."),
+            ParserTestPayload::error("1..."),
+            ParserTestPayload::error("1."),
+            ParserTestPayload::error("1.2."),
+            ParserTestPayload::error("1.2.3."),
+            ParserTestPayload::error("256.256.256.256"),
+            ParserTestPayload::error("-1.1.1.1"),
 
-            std::make_pair("1.1.1.1", true),
-            std::make_pair("1.2.3.4", true),
-            std::make_pair("240.61.57.214", true),
-            std::make_pair("15.170.164.83", true),
-            std::make_pair("248.176.111.71", true),
-            std::make_pair("183.5.156.132", true),
-            std::make_pair("75.204.127.115", true),
-            std::make_pair("43.181.85.76", true),
-            std::make_pair("111.56.86.199", true),
-            std::make_pair("161.97.115.172", true),
-            std::make_pair("31.65.212.249", true),
-            std::make_pair("160.30.239.153", true),
-            std::make_pair("55.16.69.241", true),
-            std::make_pair("133.90.28.223", true),
-            std::make_pair("215.126.103.174", true),
-            std::make_pair("235.129.168.182", true),
-            std::make_pair("126.250.190.81", true),
-            std::make_pair("20.156.35.151", true),
-            std::make_pair("5.75.252.164", true),
-            std::make_pair("188.24.112.27", true),
-            std::make_pair("217.66.134.227", true),
-            std::make_pair("118.127.45.80", true),
-            std::make_pair("216.97.162.109", true),
-            std::make_pair("55.103.248.181", true),
-            std::make_pair("113.143.88.205", true),
-            std::make_pair("222.3.87.85", true),
-            std::make_pair("241.141.151.55", true),
-            std::make_pair("171.246.14.99", true),
-            std::make_pair("2.219.31.220", true),
-            std::make_pair("16.59.90.192", true),
-            std::make_pair("39.78.137.115", true),
-            std::make_pair("69.67.41.18", true),
-            std::make_pair("143.223.80.23", true),
-            std::make_pair("62.56.133.36", true),
-            std::make_pair("112.143.193.115", true),
-            std::make_pair("220.50.147.41", true),
-            std::make_pair("243.151.125.71", true),
-            std::make_pair("29.232.187.76", true),
-            std::make_pair("174.206.68.212", true),
-            std::make_pair("241.54.49.84", true),
-            std::make_pair("132.176.4.198", true),
-            std::make_pair("153.116.75.202", true),
-            std::make_pair("110.136.24.162", true),
-            std::make_pair("142.169.243.52", true),
-            std::make_pair("93.170.246.41", true),
-            std::make_pair("1.207.43.146", true),
-            std::make_pair("95.116.121.16", true),
-            std::make_pair("98.228.27.169", true),
-            std::make_pair("221.198.235.155", true),
-            std::make_pair("7.220.32.113", true),
-            std::make_pair("64.0.106.98", true),
-            std::make_pair("165.110.234.43", true)
+            ParserTestPayload::success("1.1.1.1"),
+            ParserTestPayload::success("1.2.3.4"),
+            ParserTestPayload::success("240.61.57.214"),
+            ParserTestPayload::success("15.170.164.83"),
+            ParserTestPayload::success("248.176.111.71"),
+            ParserTestPayload::success("183.5.156.132"),
+            ParserTestPayload::success("75.204.127.115"),
+            ParserTestPayload::success("43.181.85.76"),
+            ParserTestPayload::success("111.56.86.199"),
+            ParserTestPayload::success("161.97.115.172"),
+            ParserTestPayload::success("31.65.212.249"),
+            ParserTestPayload::success("160.30.239.153"),
+            ParserTestPayload::success("55.16.69.241"),
+            ParserTestPayload::success("133.90.28.223"),
+            ParserTestPayload::success("215.126.103.174"),
+            ParserTestPayload::success("235.129.168.182"),
+            ParserTestPayload::success("126.250.190.81"),
+            ParserTestPayload::success("20.156.35.151"),
+            ParserTestPayload::success("5.75.252.164"),
+            ParserTestPayload::success("188.24.112.27"),
+            ParserTestPayload::success("217.66.134.227"),
+            ParserTestPayload::success("118.127.45.80"),
+            ParserTestPayload::success("216.97.162.109"),
+            ParserTestPayload::success("55.103.248.181"),
+            ParserTestPayload::success("113.143.88.205"),
+            ParserTestPayload::success("222.3.87.85"),
+            ParserTestPayload::success("241.141.151.55"),
+            ParserTestPayload::success("171.246.14.99"),
+            ParserTestPayload::success("2.219.31.220"),
+            ParserTestPayload::success("16.59.90.192"),
+            ParserTestPayload::success("39.78.137.115"),
+            ParserTestPayload::success("69.67.41.18"),
+            ParserTestPayload::success("143.223.80.23"),
+            ParserTestPayload::success("62.56.133.36"),
+            ParserTestPayload::success("112.143.193.115"),
+            ParserTestPayload::success("220.50.147.41"),
+            ParserTestPayload::success("243.151.125.71"),
+            ParserTestPayload::success("29.232.187.76"),
+            ParserTestPayload::success("174.206.68.212"),
+            ParserTestPayload::success("241.54.49.84"),
+            ParserTestPayload::success("132.176.4.198"),
+            ParserTestPayload::success("153.116.75.202"),
+            ParserTestPayload::success("110.136.24.162"),
+            ParserTestPayload::success("142.169.243.52"),
+            ParserTestPayload::success("93.170.246.41"),
+            ParserTestPayload::success("1.207.43.146"),
+            ParserTestPayload::success("95.116.121.16"),
+            ParserTestPayload::success("98.228.27.169"),
+            ParserTestPayload::success("221.198.235.155"),
+            ParserTestPayload::success("7.220.32.113"),
+            ParserTestPayload::success("64.0.106.98"),
+            ParserTestPayload::success("165.110.234.43")
         )
 );
 
 TEST_P(UriParserIPv4addressTestingFixture, TestThatIPv4addressParsingIsCorrect) {
-    const auto& pair = GetParam();
+    const auto& validation_data = GetParam();
 
-    const auto& text = pair.first;
-    const auto& expected_result = pair.second;
+    const auto& original_text = validation_data.original_text;
+    const auto& expected_status = validation_data.expected_status;
+    const auto& expected_text = validation_data.expected_text;
 
-    uri::__internal::TokenReader reader(text);
-    EXPECT_EQ(uri::__internal::IPv4address(reader) && !reader.hasNext(), expected_result);
+    std::optional<std::string> parsed_value;
+    uri::__internal::TokenReader reader(original_text);
+
+    EXPECT_EQ(uri::__internal::IPv4address(reader, parsed_value) && !reader.hasNext(), expected_status);
+
+    // Check only fully matched inputs.
+    if (!reader.hasNext()) {
+        EXPECT_EQ(parsed_value, expected_text);
+    }
 }

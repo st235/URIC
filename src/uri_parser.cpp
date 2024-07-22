@@ -121,12 +121,15 @@ bool uriReference(TokenReader& reader) {
 
 bool uri(TokenReader& reader) {
     // TODO(st235): remove.
+    std::optional<std::string> scheme_value;
     std::optional<std::string> query;
     std::optional<std::string> fragment;
 
     auto token = reader.save();
 
-    if (scheme(reader) && reader.consume(':') && hierPart(reader)) {
+    if (scheme(reader, scheme_value) &&
+        reader.consume(':') &&
+        hierPart(reader)) {
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
             if (!queryFragment(reader, query)) {
@@ -155,11 +158,14 @@ bool uri(TokenReader& reader) {
 
 bool absoluteUri(TokenReader& reader) {
     // TODO(st235): remove.
+    std::optional<std::string> scheme_value;
     std::optional<std::string> query;
 
     auto token = reader.save();
 
-    if (scheme(reader) && reader.consume(':') && hierPart(reader)) {
+    if (scheme(reader, scheme_value) &&
+        reader.consume(':') &&
+        hierPart(reader)) {
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
             if (!queryFragment(reader, query)) {
@@ -203,6 +209,30 @@ bool path(TokenReader& reader) {
 
     reader.restore(token);
     return false;
+}
+
+// Internal tokens.
+
+bool scheme(TokenReader& reader,
+            std::optional<std::string>& value) {
+    value = std::nullopt;
+    auto token = reader.save();
+
+    if (!IsAlpha(reader.peek())) {
+        reader.restore(token);
+        return false;
+    }
+
+    // Reading ALPHA.
+    reader.next();
+
+    while (IsAlpha(reader.peek()) || IsDigit(reader.peek()) ||
+        reader.peek() == '+' || reader.peek() == '-' || reader.peek() == '.') {
+        reader.next();
+    }
+
+    value = reader.extract(token);
+    return true;
 }
 
 bool queryFragment(TokenReader& reader,
@@ -300,26 +330,10 @@ bool relativePart(TokenReader& reader) {
     return false;
 }
 
-bool scheme(TokenReader& reader) {
-    auto token = reader.save();
-
-    if (!IsAlpha(reader.peek())) {
-        reader.restore(token);
-        return false;
-    }
-
-    // Reading ALPHA.
-    reader.next();
-
-    while (IsAlpha(reader.peek()) || IsDigit(reader.peek()) ||
-        reader.peek() == '+' || reader.peek() == '-' || reader.peek() == '.') {
-        reader.next();
-    }
-
-    return true;
-}
-
 bool authority(TokenReader& reader) {
+    // TODO(st235): remove.
+    std::optional<std::string> host_value;
+
     auto token = reader.save();
 
     if (userInfo(reader)) {
@@ -328,7 +342,7 @@ bool authority(TokenReader& reader) {
         }
     }
 
-    if (!host(reader)) {
+    if (!host(reader, host_value)) {
         reader.restore(token);
         return false;
     }
@@ -346,28 +360,20 @@ bool authority(TokenReader& reader) {
 bool userInfo(TokenReader& reader) {
     auto token = reader.save();
 
-    while (IsUnreserved(reader.peek()) || pctEncoded(reader)
-        || IsSubDelims(reader.peek()) || reader.peek() == ':') {
-        reader.next();
+    while (ConsumeUnreserved(reader) || pctEncoded(reader)
+        || ConsumeSubDelims(reader) || reader.consume(':')) {
     }
 
     return true;
 }
 
-bool host(TokenReader& reader) {
+bool host(TokenReader& reader,
+          std::optional<std::string>& value) {
     auto token = reader.save();
 
-    if (IPLiteral(reader)) {
-        return true;
-    }
-
-    reader.restore(token);
-    if (IPv4address(reader)) {
-        return true;
-    }
-
-    reader.restore(token);
-    if (regName(reader)) {
+    if (IPLiteral(reader, value) ||
+        IPv4address(reader, value) ||
+        regName(reader, value)) {
         return true;
     }
 
@@ -385,7 +391,9 @@ bool port(TokenReader& reader) {
     return true;
 }
 
-bool IPLiteral(TokenReader& reader) {
+bool IPLiteral(TokenReader& reader,
+               std::optional<std::string>& value) {
+    value = std::nullopt;
     auto token = reader.save();
 
     if (!reader.consume('[')) {
@@ -393,16 +401,52 @@ bool IPLiteral(TokenReader& reader) {
         return false;
     }
 
+    auto value_start_token = reader.save();
+
     if (!IPv6address(reader) && !IPvFuture(reader)) {
         reader.restore(token);
         return false;
     }
+
+    auto value_end_token = reader.save();
 
     if (!reader.consume(']')) {
         reader.restore(token);
         return false;
     }
 
+    value = reader.extract(value_start_token, value_end_token);
+    return true;
+}
+
+bool IPv4address(TokenReader& reader,
+                 std::optional<std::string>& value) {
+    value = std::nullopt;
+    auto token = reader.save();
+
+    if (decOctet(reader) && reader.consume('.') &&
+        decOctet(reader) && reader.consume('.') &&
+        decOctet(reader) && reader.consume('.') &&
+        decOctet(reader)) {
+        value = reader.extract(token);
+        return true;
+    }
+
+    reader.restore(token);
+    return false;
+}
+
+bool regName(TokenReader& reader,
+             std::optional<std::string>& value) {
+    value = std::nullopt;
+    auto token = reader.save();
+
+    while (ConsumeUnreserved(reader) ||
+           pctEncoded(reader) ||
+           ConsumeSubDelims(reader)) {
+    }
+
+    value = reader.extract(token);
     return true;
 }
 
@@ -742,21 +786,10 @@ bool ls32_Alteration1(TokenReader& reader) {
 bool ls32(TokenReader& reader) {
     auto token = reader.save();
 
-    if (ls32_Alteration1(reader) || IPv4address(reader)) {
-        return true;
-    }
-
-    reader.restore(token);
-    return false;
-}
-
-bool IPv4address(TokenReader& reader) {
-    auto token = reader.save();
-
-    if (decOctet(reader) && reader.consume('.') &&
-        decOctet(reader) && reader.consume('.') &&
-        decOctet(reader) && reader.consume('.') &&
-        decOctet(reader)) {
+    // TODO(st235): think about better API to improve the parsing?
+    std::optional<std::string> discarded_value;
+    if (ls32_Alteration1(reader) ||
+        IPv4address(reader, discarded_value)) {
         return true;
     }
 
@@ -873,17 +906,6 @@ bool decOctet(TokenReader& reader) {
 
     reader.restore(token);
     return false;
-}
-
-bool regName(TokenReader& reader) {
-    auto token = reader.save();
-
-    while (ConsumeUnreserved(reader) ||
-           pctEncoded(reader) ||
-           ConsumeSubDelims(reader)) {
-    }
-
-    return true;
 }
 
 bool pathOptionalSegment(TokenReader& reader) {
