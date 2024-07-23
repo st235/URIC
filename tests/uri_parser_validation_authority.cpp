@@ -5,82 +5,49 @@
 
 #include "token_reader.h"
 #include "uri_parser.h"
+#include "utils/parser_test_utils.h"
 
-struct AuthorityTestPayload {
-    std::string original_text;
+using UriTestPayload = tests::UriTestPayload;
 
-    bool expected_status;
-    std::optional<std::string> expected_userInfo;
-    std::optional<std::string> expected_host;
-    std::optional<std::string> expected_port;
-
-    static AuthorityTestPayload error(const std::string& original_text) {
-        return { original_text, false, std::nullopt, std::nullopt, std::nullopt };
-    }
-
-    static AuthorityTestPayload success(const std::string& original_text,
-                                        std::optional<std::string> expected_userInfo = std::nullopt,
-                                        std::optional<std::string> expected_host = std::nullopt,
-                                        std::optional<std::string> expected_port = std::nullopt) {
-        return { original_text, true, expected_userInfo, expected_host, expected_port };
-    }
-};
-
-std::ostream& operator<<(std::ostream& stream, const AuthorityTestPayload& data) {
-    stream << "{ "
-           << "original text = " << data.original_text
-           << ", expected status = " << data.expected_status;
-
-    if (data.expected_userInfo) {
-        stream << ", expected userInfo = " << data.expected_userInfo.value();
-    } else {
-        stream << ", expected userInfo = null";
-    }
-
-    if (data.expected_host) {
-        stream << ", expected host = " << data.expected_host.value();
-    } else {
-        stream << ", expected host = null";
-    }
-
-    if (data.expected_port) {
-        stream << ", expected port = " << data.expected_port.value();
-    } else {
-        stream << ", expected port = null";
-    }
-
-    stream << " }";
-
-    return stream;
-}
-
-class UriParserAuthorityTestingFixture: public ::testing::TestWithParam<AuthorityTestPayload> {};
+class UriParserAuthorityTestingFixture: public ::testing::TestWithParam<UriTestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParserAuthorityTests,
         UriParserAuthorityTestingFixture,
         ::testing::Values(
-            AuthorityTestPayload::error("website.com?q=5"),
-            AuthorityTestPayload::error("/website.com"),
+            UriTestPayload::error("website.com?q=5"),
+            UriTestPayload::error("/website.com"),
 
-            AuthorityTestPayload::success("", std::nullopt, ""),
-            AuthorityTestPayload::success(":", std::nullopt, "", ""),
-            AuthorityTestPayload::success("@", "", ""),
-            AuthorityTestPayload::success("@:", "", "", ""),
-            AuthorityTestPayload::success("website.com", std::nullopt, "website.com"),
-            AuthorityTestPayload::success("website.net", std::nullopt, "website.net"),
-            AuthorityTestPayload::success("somesite.co.uk:3036", std::nullopt, "somesite.co.uk", "3036"),
-            AuthorityTestPayload::success("localhost:80", std::nullopt, "localhost", "80"),
-            AuthorityTestPayload::success("port.net:", std::nullopt, "port.net", ""),
-            AuthorityTestPayload::success("st235@website.com", "st235", "website.com"),
-            AuthorityTestPayload::success("text:hello@website.net", "text:hello", "website.net"),
-            AuthorityTestPayload::success("somesite.co.uk:3036", std::nullopt, "somesite.co.uk", "3036"),
-            AuthorityTestPayload::success("st235@localhost:80", "st235", "localhost", "80"),
-            AuthorityTestPayload::success("reallylong=userinfo+.:text@port.net:", "reallylong=userinfo+.:text", "port.net", ""),
-            AuthorityTestPayload::success("@website.com:", "", "website.com", ""),
-            AuthorityTestPayload::success("@website.com:19321", "", "website.com", "19321"),
-            AuthorityTestPayload::success("st235:github.com@website.com:8080", "st235:github.com", "website.com", "8080"),
-            AuthorityTestPayload::success("localhost", std::nullopt, "localhost")
+            UriTestPayload::success("").expectHost(""),
+            UriTestPayload::success(":").expectHost("").expectPort(""),
+            UriTestPayload::success("@").expectUserInfo("").expectHost(""),
+            UriTestPayload::success("@:").expectUserInfo("").expectHost("").expectPort(""),
+            UriTestPayload::success("website.com").expectHost("website.com"),
+            UriTestPayload::success("website.net").expectHost("website.net"),
+            UriTestPayload::success("somesite.co.uk:3036").expectHost("somesite.co.uk").expectPort("3036"),
+            UriTestPayload::success("localhost:80").expectHost("localhost").expectPort("80"),
+            UriTestPayload::success("port.net:").expectHost("port.net").expectPort(""),
+            UriTestPayload::success("st235@website.com").expectUserInfo("st235").expectHost("website.com"),
+            UriTestPayload::success("text:hello@website.net").expectUserInfo("text:hello").expectHost("website.net"),
+            UriTestPayload::success("192.168.1.1:3036").expectHost("192.168.1.1").expectPort("3036"),
+            UriTestPayload::success("st235@localhost:80").expectUserInfo("st235").expectHost("localhost").expectPort("80"),
+            UriTestPayload::success("reallylong=userinfo+.:text@port.net:")
+                .expectUserInfo("reallylong=userinfo+.:text")
+                .expectHost("port.net")
+                .expectPort(""),
+            UriTestPayload::success("@website.com:")
+                .expectUserInfo("")
+                .expectHost("website.com")
+                .expectPort(""),
+            UriTestPayload::success("@website.com:19321")
+                .expectUserInfo("")
+                .expectHost("website.com")
+                .expectPort("19321"),
+            UriTestPayload::success("st235:github.com@website.com:8080")
+                .expectUserInfo("st235:github.com")
+                .expectHost("website.com")
+                .expectPort("8080"),
+            UriTestPayload::success("localhost").expectHost("localhost")
         )
 );
 
