@@ -104,16 +104,14 @@ namespace uri {
 
 namespace __internal {
 
-bool uriReference(TokenReader& reader) {
-    // TODO(st235): remove.
-    std::optional<std::string> outScheme;
-    std::optional<std::string> outUserInfo;
-    std::optional<std::string> outHost;
-    std::optional<std::string> outPort;
-    std::optional<std::string> outPath;
-    std::optional<std::string> outQuery;
-    std::optional<std::string> outFragment;
-
+bool uriReference(TokenReader& reader,
+                  std::optional<std::string>& outScheme,
+                  std::optional<std::string>& outUserInfo,
+                  std::optional<std::string>& outHost,
+                  std::optional<std::string>& outPort,
+                  std::optional<std::string>& outPath,
+                  std::optional<std::string>& outQuery,
+                  std::optional<std::string>& outFragment) {
     auto token = reader.save();
 
     if (uri(reader, outScheme,
@@ -122,13 +120,20 @@ bool uriReference(TokenReader& reader) {
         relativeRef(reader,
                     outUserInfo, outHost, outPort,
                     outPath, outQuery, outFragment)) {
-        if (reader.hasNext()) {
-            reader.restore(token);
-            return false;
+
+        // Math only the entire input.
+        if (!reader.hasNext()) {
+            return true;
         }
-        return true;
     }
 
+    outScheme = std::nullopt;
+    outUserInfo = std::nullopt;
+    outHost = std::nullopt;
+    outPort = std::nullopt;
+    outPath = std::nullopt;
+    outQuery = std::nullopt;
+    outFragment = std::nullopt;
     reader.restore(token);
     return false;
 }

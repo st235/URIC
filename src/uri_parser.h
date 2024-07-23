@@ -19,7 +19,14 @@ class TokenReader;
 // These tokens expect to match the
 // entire string: from the begging till the end.
 
-bool uriReference(TokenReader& reader);
+bool uriReference(TokenReader& reader,
+                  std::optional<std::string>& outScheme,
+                  std::optional<std::string>& outUserInfo,
+                  std::optional<std::string>& outHost,
+                  std::optional<std::string>& outPort,
+                  std::optional<std::string>& outPath,
+                  std::optional<std::string>& outQuery,
+                  std::optional<std::string>& outFragment);
 
 bool uri(TokenReader& reader,
          std::optional<std::string>& outScheme,
