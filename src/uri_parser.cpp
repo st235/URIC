@@ -106,6 +106,7 @@ namespace __internal {
 
 bool uriReference(TokenReader& reader) {
     // TODO(st235): remove.
+    std::optional<std::string> outScheme;
     std::optional<std::string> outUserInfo;
     std::optional<std::string> outHost;
     std::optional<std::string> outPort;
@@ -115,7 +116,9 @@ bool uriReference(TokenReader& reader) {
 
     auto token = reader.save();
 
-    if (uri(reader) ||
+    if (uri(reader, outScheme,
+            outUserInfo, outHost, outPort,
+            outPath, outQuery, outFragment) ||
         relativeRef(reader,
                     outUserInfo, outHost, outPort,
                     outPath, outQuery, outFragment)) {
@@ -130,45 +133,48 @@ bool uriReference(TokenReader& reader) {
     return false;
 }
 
-bool uri(TokenReader& reader) {
-    // TODO(st235): remove.
-    std::optional<std::string> scheme_value;
-    std::optional<std::string> outUserInfo;
-    std::optional<std::string> outHost;
-    std::optional<std::string> outPort;
-    std::optional<std::string> outPath;
-    std::optional<std::string> query;
-    std::optional<std::string> fragment;
-
+bool uri(TokenReader& reader,
+         std::optional<std::string>& outScheme,
+         std::optional<std::string>& outUserInfo,
+         std::optional<std::string>& outHost,
+         std::optional<std::string>& outPort,
+         std::optional<std::string>& outPath,
+         std::optional<std::string>& outQuery,
+         std::optional<std::string>& outFragment) {
     auto token = reader.save();
 
-    if (scheme(reader, scheme_value) &&
+    if (scheme(reader, outScheme) &&
         reader.consume(':') &&
         hierPart(reader,
                  outUserInfo, outHost, outPort,
                  outPath)) {
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
-            if (!queryFragment(reader, query)) {
+            if (!queryFragment(reader, outQuery)) {
                 reader.restore(optional1_token);
             }
         }
 
         auto optional2_token = reader.save();
         if (reader.consume('#')) {
-            if (!queryFragment(reader, fragment)) {
+            if (!queryFragment(reader, outFragment)) {
                 reader.restore(optional2_token);
             }
         }
 
-        if (reader.hasNext()) {
-            reader.restore(token);
-            return false;
+        // Math only the entire input.
+        if (!reader.hasNext()) {
+            return true;
         }
-
-        return true;
     }
 
+    outScheme = std::nullopt;
+    outUserInfo = std::nullopt;
+    outHost = std::nullopt;
+    outPort = std::nullopt;
+    outPath = std::nullopt;
+    outQuery = std::nullopt;
+    outFragment = std::nullopt;
     reader.restore(token);
     return false;
 }

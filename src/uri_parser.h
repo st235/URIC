@@ -21,7 +21,14 @@ class TokenReader;
 
 bool uriReference(TokenReader& reader);
 
-bool uri(TokenReader& reader);
+bool uri(TokenReader& reader,
+         std::optional<std::string>& outScheme,
+         std::optional<std::string>& outUserInfo,
+         std::optional<std::string>& outHost,
+         std::optional<std::string>& outPort,
+         std::optional<std::string>& outPath,
+         std::optional<std::string>& outQuery,
+         std::optional<std::string>& outFragment);
 
 bool absoluteUri(TokenReader& reader,
                  std::optional<std::string>& outScheme,

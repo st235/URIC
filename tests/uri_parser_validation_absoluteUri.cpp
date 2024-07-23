@@ -94,16 +94,12 @@ TEST_P(UriParserAbsoluteUriTestingFixture, TestThatAbsoluteUriParsingIsCorrect) 
         uri::__internal::absoluteUri(reader,
             parsed_scheme,
             parsed_userInfo, parsed_host, parsed_port, parsed_path,
-            parsed_query) &&
-        !reader.hasNext(), expected_status);
+            parsed_query), expected_status);
 
-    // Check only fully matched inputs.
-    if (!reader.hasNext()) {
-        EXPECT_EQ(parsed_scheme, expected_scheme);
-        EXPECT_EQ(parsed_userInfo, expected_userInfo);
-        EXPECT_EQ(parsed_host, expected_host);
-        EXPECT_EQ(parsed_port, expected_port);
-        EXPECT_EQ(parsed_path, expected_path);
-        EXPECT_EQ(parsed_query, expected_query);
-    }
+    EXPECT_EQ(parsed_scheme, expected_scheme);
+    EXPECT_EQ(parsed_userInfo, expected_userInfo);
+    EXPECT_EQ(parsed_host, expected_host);
+    EXPECT_EQ(parsed_port, expected_port);
+    EXPECT_EQ(parsed_path, expected_path);
+    EXPECT_EQ(parsed_query, expected_query);
 }
