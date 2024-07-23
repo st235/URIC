@@ -173,37 +173,38 @@ bool uri(TokenReader& reader) {
     return false;
 }
 
-bool absoluteUri(TokenReader& reader) {
-    // TODO(st235): remove.
-    std::optional<std::string> outUserInfo;
-    std::optional<std::string> outHost;
-    std::optional<std::string> outPort;
-    std::optional<std::string> outPath;
-    std::optional<std::string> scheme_value;
-    std::optional<std::string> query;
-
+bool absoluteUri(TokenReader& reader,
+                 std::optional<std::string>& outScheme,
+                 std::optional<std::string>& outUserInfo,
+                 std::optional<std::string>& outHost,
+                 std::optional<std::string>& outPort,
+                 std::optional<std::string>& outPath,
+                 std::optional<std::string>& outQuery) {
     auto token = reader.save();
 
-    if (scheme(reader, scheme_value) &&
+    if (scheme(reader, outScheme) &&
         reader.consume(':') &&
-        hierPart(reader,
-            outUserInfo, outHost, outPort,
-            outPath)) {
+        hierPart(reader, outUserInfo, outHost, outPort, outPath)) {
+
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
-            if (!queryFragment(reader, query)) {
+            if (!queryFragment(reader, outQuery)) {
                 reader.restore(optional1_token);
             }
         }
 
-        if (reader.hasNext()) {
-            reader.restore(token);
-            return false;
+        // Return only if we read the entire input.
+        if (!reader.hasNext()) {
+            return true;
         }
-
-        return true;
     }
 
+    outScheme = std::nullopt;
+    outUserInfo = std::nullopt;
+    outHost = std::nullopt;
+    outPort = std::nullopt;
+    outPath = std::nullopt;
+    outQuery = std::nullopt;
     reader.restore(token);
     return false;
 }
