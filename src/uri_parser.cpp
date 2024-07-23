@@ -105,9 +105,20 @@ namespace uri {
 namespace __internal {
 
 bool uriReference(TokenReader& reader) {
+    // TODO(st235): remove.
+    std::optional<std::string> outUserInfo;
+    std::optional<std::string> outHost;
+    std::optional<std::string> outPort;
+    std::optional<std::string> outPath;
+    std::optional<std::string> outQuery;
+    std::optional<std::string> outFragment;
+
     auto token = reader.save();
 
-    if (uri(reader) || relativeRef(reader)) {
+    if (uri(reader) ||
+        relativeRef(reader,
+                    outUserInfo, outHost, outPort,
+                    outPath, outQuery, outFragment)) {
         if (reader.hasNext()) {
             reader.restore(token);
             return false;
@@ -122,6 +133,10 @@ bool uriReference(TokenReader& reader) {
 bool uri(TokenReader& reader) {
     // TODO(st235): remove.
     std::optional<std::string> scheme_value;
+    std::optional<std::string> outUserInfo;
+    std::optional<std::string> outHost;
+    std::optional<std::string> outPort;
+    std::optional<std::string> outPath;
     std::optional<std::string> query;
     std::optional<std::string> fragment;
 
@@ -129,7 +144,9 @@ bool uri(TokenReader& reader) {
 
     if (scheme(reader, scheme_value) &&
         reader.consume(':') &&
-        hierPart(reader)) {
+        hierPart(reader,
+                 outUserInfo, outHost, outPort,
+                 outPath)) {
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
             if (!queryFragment(reader, query)) {
@@ -158,6 +175,10 @@ bool uri(TokenReader& reader) {
 
 bool absoluteUri(TokenReader& reader) {
     // TODO(st235): remove.
+    std::optional<std::string> outUserInfo;
+    std::optional<std::string> outHost;
+    std::optional<std::string> outPort;
+    std::optional<std::string> outPath;
     std::optional<std::string> scheme_value;
     std::optional<std::string> query;
 
@@ -165,7 +186,9 @@ bool absoluteUri(TokenReader& reader) {
 
     if (scheme(reader, scheme_value) &&
         reader.consume(':') &&
-        hierPart(reader)) {
+        hierPart(reader,
+            outUserInfo, outHost, outPort,
+            outPath)) {
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
             if (!queryFragment(reader, query)) {
@@ -263,33 +286,31 @@ bool queryFragment(TokenReader& reader,
     return true;
 }
 
-bool hierPart(TokenReader& reader) {
-    // TODO(st235): remove.
-    std::optional<std::string> valueUserInfo;
-    std::optional<std::string> valueHost;
-    std::optional<std::string> valuePort;
-    std::optional<std::string> valuePath;
-
+bool hierPart(TokenReader& reader,
+              std::optional<std::string>& outUserInfo,
+              std::optional<std::string>& outHost,
+              std::optional<std::string>& outPort,
+              std::optional<std::string>& outPath) {
     auto token = reader.save();
 
     if (reader.consumeAll("//") &&
-        authority(reader, valueUserInfo, valueHost, valuePort) &&
-        pathAbempty(reader, valuePath)) {
+        authority(reader, outUserInfo, outHost, outPort) &&
+        pathAbempty(reader, outPath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathAbsolute(reader, valuePath)) {
+    if (pathAbsolute(reader, outPath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathRootless(reader, valuePath)) {
+    if (pathRootless(reader, outPath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathEmpty(reader, valuePath)) {
+    if (pathEmpty(reader, outPath)) {
         return true;
     }
 
@@ -297,28 +318,32 @@ bool hierPart(TokenReader& reader) {
     return false;
 }
 
-bool relativeRef(TokenReader& reader) {
-    // TODO(st235): remove.
-    std::optional<std::string> query;
-    std::optional<std::string> fragment;
-
+bool relativeRef(TokenReader& reader,
+                 std::optional<std::string>& outUserInfo,
+                 std::optional<std::string>& outHost,
+                 std::optional<std::string>& outPort,
+                 std::optional<std::string>& outPath,
+                 std::optional<std::string>& outQuery,
+                 std::optional<std::string>& outFragment) {
     auto token = reader.save();
 
-    if (!relativePart(reader)) {
+    if (!relativePart(reader,
+                      outUserInfo, outHost, outPort,
+                      outPath)) {
         reader.restore(token);
         return false;
     }
 
     auto optional1_token = reader.save();
     if (reader.consume('?')) {
-        if (!queryFragment(reader, query)) {
+        if (!queryFragment(reader, outQuery)) {
             reader.restore(optional1_token);
         }
     }
 
     auto optional2_token = reader.save();
     if (reader.consume('#')) {
-        if (!queryFragment(reader, fragment)) {
+        if (!queryFragment(reader, outFragment)) {
             reader.restore(optional2_token);
         }
     }
@@ -326,33 +351,31 @@ bool relativeRef(TokenReader& reader) {
     return true;
 }
 
-bool relativePart(TokenReader& reader) {
-    // TODO(st235): remove.
-    std::optional<std::string> valueUserInfo;
-    std::optional<std::string> valueHost;
-    std::optional<std::string> valuePort;
-    std::optional<std::string> valuePath;
-
+bool relativePart(TokenReader& reader,
+                  std::optional<std::string>& outUserInfo,
+                  std::optional<std::string>& outHost,
+                  std::optional<std::string>& outPort,
+                  std::optional<std::string>& outPath) {
     auto token = reader.save();
 
     if (reader.consumeAll("//") &&
-        authority(reader, valueUserInfo, valueHost, valuePort) &&
-        pathAbempty(reader, valuePath)) {
+        authority(reader, outUserInfo, outHost, outPort) &&
+        pathAbempty(reader, outPath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathAbsolute(reader, valuePath)) {
+    if (pathAbsolute(reader, outPath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathNoscheme(reader, valuePath)) {
+    if (pathNoscheme(reader, outPath)) {
         return true;
     }
 
     reader.restore(token);
-    if (pathEmpty(reader, valuePath)) {
+    if (pathEmpty(reader, outPath)) {
         return true;
     }
 

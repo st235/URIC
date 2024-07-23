@@ -26,44 +26,58 @@ bool uri(TokenReader& reader);
 bool absoluteUri(TokenReader& reader);
 
 bool path(TokenReader& reader,
-          std::optional<std::string>& value);
+          std::optional<std::string>& outValue);
 
 // Internal tokens (sorted by importance).
 
 bool scheme(TokenReader& reader,
-            std::optional<std::string>& value);
+            std::optional<std::string>& outValue);
 
 bool host(TokenReader& reader,
-          std::optional<std::string>& value);
+          std::optional<std::string>& outValue);
 
 bool queryFragment(TokenReader& reader,
-                   std::optional<std::string>& value);
+                   std::optional<std::string>& outValue);
 
-bool hierPart(TokenReader& reader);
+bool hierPart(TokenReader& reader,
+              std::optional<std::string>& outUserInfo,
+              std::optional<std::string>& outHost,
+              std::optional<std::string>& outPort,
+              std::optional<std::string>& outPath);
 
-bool relativeRef(TokenReader& reader);
+bool relativeRef(TokenReader& reader,
+                 std::optional<std::string>& outUserInfo,
+                 std::optional<std::string>& outHost,
+                 std::optional<std::string>& outPort,
+                 std::optional<std::string>& outPath,
+                 std::optional<std::string>& outQuery,
+                 std::optional<std::string>& outFragment);
 
-bool relativePart(TokenReader& reader);
+bool relativePart(TokenReader& reader,
+                  std::optional<std::string>& outUserInfo,
+                  std::optional<std::string>& outHost,
+                  std::optional<std::string>& outPort,
+                  std::optional<std::string>& outPath);
 
 bool authority(TokenReader& reader,
-               std::optional<std::string>& userInfo,
-               std::optional<std::string>& host,
-               std::optional<std::string>& port);
+               std::optional<std::string>& outUserInfo,
+               std::optional<std::string>& outHost,
+               std::optional<std::string>& outPort);
 
 bool userInfo(TokenReader& reader,
-              std::optional<std::string>& value);
+              std::optional<std::string>& outValue);
 
 bool port(TokenReader& reader,
-          std::optional<std::string>& value);
+          std::optional<std::string>& outValue);
 
 bool IPLiteral(TokenReader& reader,
-               std::optional<std::string>& value);
+               std::optional<std::string>& outValue);
 
 bool IPv4address(TokenReader& reader,
-                 std::optional<std::string>& value);
+                 std::optional<std::string>& outValue);
 
 bool regName(TokenReader& reader,
-             std::optional<std::string>& value);
+             std::optional<std::string>& outValue);
 
 bool IPvFuture(TokenReader& reader);
 
@@ -76,19 +90,19 @@ bool ls32(TokenReader& reader);
 bool decOctet(TokenReader& reader);
 
 bool pathAbempty(TokenReader& reader,
-                 std::optional<std::string>& value);
+                 std::optional<std::string>& outValue);
 
 bool pathAbsolute(TokenReader& reader,
-                  std::optional<std::string>& value);
+                  std::optional<std::string>& outValue);
 
 bool pathNoscheme(TokenReader& reader,
-                  std::optional<std::string>& value);
+                  std::optional<std::string>& outValue);
 
 bool pathRootless(TokenReader& reader,
-                  std::optional<std::string>& value);
+                  std::optional<std::string>& outValue);
 
 bool pathEmpty(TokenReader& reader,
-               std::optional<std::string>& value);
+               std::optional<std::string>& outValue);
 
 bool segment(TokenReader& reader);
 
