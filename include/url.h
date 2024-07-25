@@ -127,7 +127,7 @@ public:
                 continue;
             }
 
-            if (raw_query[i] == kQueryKeyValueSeparator) {
+            if (!keyValueSeparatorFound && raw_query[i] == kQueryKeyValueSeparator) {
                 keyValueSeparatorFound = true;
 
                 i++;

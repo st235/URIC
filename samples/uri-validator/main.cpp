@@ -21,32 +21,35 @@ int main(int argc, char *argv[]) {
 
     const auto& uri = uri_opt.value();
 
+    std::cout << std::endl;
+
     if (uri.getScheme()) {
-        std::cout << "scheme=" << uri.getScheme().value() << std::endl;
+        std::cout << "Scheme: " << uri.getScheme().value() << std::endl;
     }
 
     if (uri.getAuthority()) {
         const auto& authority = uri.getAuthority().value();
 
+        std::cout << "Authority:" << std::endl;
         if (authority.getUserInfo()) {
-            std::cout << "userInfo=" << authority.getUserInfo().value() << std::endl;
+            std::cout << "\tUser Info: " << authority.getUserInfo().value() << std::endl;
         }
 
-        std::cout << "host=" << authority.getHost() << std::endl;
+        std::cout << "\tHost: " << authority.getHost() << std::endl;
 
         if (authority.getPort()) {
-            std::cout << "port=" << authority.getPort().value() << std::endl;
+            std::cout << "\tPort: " << authority.getPort().value() << std::endl;
         }
     }
 
-    std::cout << "path=" << uri.getPath() << std::endl;
+    std::cout << "Path: " << uri.getPath() << std::endl;
 
     if (uri.getQuery()) {
-        std::cout << "query=" << uri.getQuery().value() << std::endl;
+        std::cout << "Query: " << uri.getQuery().value() << std::endl;
     }
 
     if (uri.getFragment()) {
-        std::cout << "fragment=" << uri.getFragment().value() << std::endl;
+        std::cout << "Fragment: " << uri.getFragment().value() << std::endl;
     }
 
     return 0;
