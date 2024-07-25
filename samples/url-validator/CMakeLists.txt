@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.26)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(uri-validator VERSION 1.0 DESCRIPTION "Validates random URIs.")
+project(url-validator VERSION 1.0 DESCRIPTION "Validates random URIs.")
 
-add_executable(uri-validator
+add_executable(url-validator
     main.cpp
 )
 
@@ -22,4 +22,4 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(URIC)
 
-target_link_libraries(uri-validator uric)
+target_link_libraries(url-validator uric)

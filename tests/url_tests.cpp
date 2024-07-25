@@ -22,6 +22,8 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_pair("http://github.com/st235?q1=9.88&a=b&re=t", query_params_t({ {"q1", "9.88"}, {"a", "b"}, {"re", "t"} })),
             std::make_pair("http://github.com/st235?a=hello&b=&", query_params_t({ {"a", "hello"}, {"b", ""} })),
             std::make_pair("http://github.com/st235?hello=world&=&", query_params_t({ {"hello", "world"}, {"", ""} })),
+            std::make_pair("http://github.com/st235?hello=world&=&==", query_params_t({ {"hello", "world"}, {"", "="} })),
+            std::make_pair("http://github.com/st235?===", query_params_t({ {"", "=="} })),
             std::make_pair("/posts/tag/app/search#contact", query_params_t())
         )
 );
