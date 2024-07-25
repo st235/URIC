@@ -580,9 +580,9 @@ bool IPv6address_optional(TokenReader& reader, size_t k) {
     if (!h16(reader)) {
         reader.restore(token);
 
-        size_t kn = repeat_counter - 1;
-        if (kn < 0) {
-            kn = 0;
+        size_t kn = 0;
+        if (repeat_counter > 0) {
+            kn = repeat_counter - 1;
         }
         repeat_counter = 0;
 
