@@ -45,6 +45,7 @@ add_executable(uric_tests
   # API tests.
   tests/authority_tests.cpp
   tests/uri_tests.cpp
+  tests/url_tests.cpp
   
   # Parser tests.
   #  Utils.
