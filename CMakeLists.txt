@@ -10,6 +10,7 @@ add_library(uric INTERFACE)
 target_sources(uric INTERFACE
   # API implementation.
   src/authority.cpp
+  src/uri.cpp
   # Token reader.
   src/token_reader.h
   # Uri parser.
