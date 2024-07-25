@@ -53,7 +53,7 @@ class TokenReader {
     }
 
     std::string extract(token_t start, token_t end) const {
-        if (start < 0 || end > _raw_text.length() || end <= start) {
+        if (end > _raw_text.length() || end <= start) {
             return "";
         }
 

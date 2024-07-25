@@ -22,7 +22,7 @@ INSTANTIATE_TEST_SUITE_P(
             ParserTestPayload::success("0"),
             ParserTestPayload::success("ab"),
             ParserTestPayload::success("abc"),
-            ParserTestPayload::success("/a\%20"),
+            ParserTestPayload::success("/a%20"),
             ParserTestPayload::success("abc/hello"),
             ParserTestPayload::success("0/hello"),
             ParserTestPayload::success("/hello/world"),

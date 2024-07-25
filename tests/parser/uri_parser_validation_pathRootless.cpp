@@ -19,9 +19,9 @@ INSTANTIATE_TEST_SUITE_P(
             ParserTestPayload::error("/"),
             ParserTestPayload::error("/a"),
             ParserTestPayload::error("/1b"),
-            ParserTestPayload::error("/c2\%20"),
+            ParserTestPayload::error("/c2%20"),
             ParserTestPayload::error("/ab0/aaa/swes"),
-            ParserTestPayload::error("/a_b0/a21\%20a/"),
+            ParserTestPayload::error("/a_b0/a21%20a/"),
             ParserTestPayload::error("//"),
 
             ParserTestPayload::success(":"),
