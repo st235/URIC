@@ -437,8 +437,7 @@ bool port(TokenReader& reader,
     value = std::nullopt;
     auto token = reader.save();
 
-    while (IsDigit(reader.peek())) {
-        reader.next();
+    while (ConsumeDigit(reader)) {
     }
 
     value = reader.extract(token);
@@ -801,8 +800,7 @@ bool h16(TokenReader& reader) {
     auto token = reader.save();
 
     size_t count = 0;
-    while (count < 4 && IsHexDigit(reader.peek())) {
-        reader.next();
+    while (count < 4 && ConsumeHexDigit(reader)) {
         count += 1;
     }
 
@@ -882,11 +880,10 @@ bool decOctet_variation2(TokenReader& reader) {
     }
     reader.next();
 
-    if (!IsDigit(reader.peek())) {
+    if (!ConsumeDigit(reader)) {
         reader.restore(token);
         return false;
     }
-    reader.next();
 
     return true;
 }
@@ -899,17 +896,15 @@ bool decOctet_variation3(TokenReader& reader) {
         return false;
     }
 
-    if (!IsDigit(reader.peek())) {
+    if (!ConsumeDigit(reader)) {
         reader.restore(token);
         return false;
     }
-    reader.next();
 
-    if (!IsDigit(reader.peek())) {
+    if (!ConsumeDigit(reader)) {
         reader.restore(token);
         return false;
     }
-    reader.next();
 
     return true;
 }
@@ -924,11 +919,10 @@ bool decOctet_variation4(TokenReader& reader) {
     }
     reader.next();
 
-    if (!IsDigit(reader.peek())) {
+    if (!ConsumeDigit(reader)) {
         reader.restore(token);
         return false;
     }
-    reader.next();
 
     return true;
 }
@@ -936,11 +930,10 @@ bool decOctet_variation4(TokenReader& reader) {
 bool decOctet_variation5(TokenReader& reader) {
     auto token = reader.save();
 
-    if (!IsDigit(reader.peek())) {
+    if (!ConsumeDigit(reader)) {
         reader.restore(token);
         return false;
     }
-    reader.next();
 
     return true;
 }
