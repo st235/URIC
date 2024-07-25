@@ -19,12 +19,12 @@ target_sources(uric INTERFACE
 )
 target_include_directories(uric INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
-#  Enable all possible warnings and treat them as errors.
-# if(MSVC)
-#   target_compile_options(uric INTERFACE /W4 /WX)
-# else()
-#   target_compile_options(uric INTERFACE -Wall -Wextra -Wpedantic -Werror)
-# endif()
+# Enable all possible warnings and treat them as errors.
+if(MSVC)
+  target_compile_options(uric INTERFACE /W4 /WX)
+else()
+  target_compile_options(uric INTERFACE -Wall -Wextra -Wpedantic -Werror)
+endif()
 
 # Test targets.
 

@@ -18,22 +18,22 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_pair("", false),
             std::make_pair("11", false),
             std::make_pair("AB", false),
-            std::make_pair("\%", false),
-            std::make_pair("\%A", false),
-            std::make_pair("\%AV", false),
-            std::make_pair("\%ZA", false),
-            std::make_pair("\%ABC", false),
+            std::make_pair("%", false),
+            std::make_pair("%A", false),
+            std::make_pair("%AV", false),
+            std::make_pair("%ZA", false),
+            std::make_pair("%ABC", false),
 
-            std::make_pair("\%ab", true),
-            std::make_pair("\%0F", true),
-            std::make_pair("\%20", true),
-            std::make_pair("\%01", true),
-            std::make_pair("\%99", true),
-            std::make_pair("\%1B", true),
-            std::make_pair("\%C2", true),
-            std::make_pair("\%F5", true),
-            std::make_pair("\%AA", true),
-            std::make_pair("\%FF", true)
+            std::make_pair("%ab", true),
+            std::make_pair("%0F", true),
+            std::make_pair("%20", true),
+            std::make_pair("%01", true),
+            std::make_pair("%99", true),
+            std::make_pair("%1B", true),
+            std::make_pair("%C2", true),
+            std::make_pair("%F5", true),
+            std::make_pair("%AA", true),
+            std::make_pair("%FF", true)
         )
 );
 

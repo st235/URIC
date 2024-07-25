@@ -26,14 +26,14 @@ bool IsSubDelims(char c) {
            (c == ',') || (c == ';') || (c == '=');
 }
 
-bool IsGenDelims(char c) {
-    return (c == ':') || (c == '/') || (c == '?') || (c == '#') ||
-           (c == '[') || (c == ']') || (c == '@');
-}
+// bool IsGenDelims(char c) {
+//     return (c == ':') || (c == '/') || (c == '?') || (c == '#') ||
+//            (c == '[') || (c == ']') || (c == '@');
+// }
 
-bool IsReserved(char c) {
-    return IsGenDelims(c) || IsSubDelims(c);
-}
+// bool IsReserved(char c) {
+//     return IsGenDelims(c) || IsSubDelims(c);
+// }
 
 bool IsUnreserved(char c) {
     return IsAlpha(c) || IsDigit(c) ||
@@ -67,22 +67,6 @@ bool ConsumeHexDigit(uri::__internal::TokenReader& reader) {
 
 bool ConsumeSubDelims(uri::__internal::TokenReader& reader) {
     if (IsSubDelims(reader.peek())) {
-        reader.next();
-        return true;
-    }
-    return false;
-}
-
-bool ConsumeGenDelims(uri::__internal::TokenReader& reader) {
-    if (IsGenDelims(reader.peek())) {
-        reader.next();
-        return true;
-    }
-    return false;
-}
-
-bool ConsumeReserved(uri::__internal::TokenReader& reader) {
-    if (IsReserved(reader.peek())) {
         reader.next();
         return true;
     }
@@ -267,17 +251,13 @@ bool scheme(TokenReader& reader,
     value = std::nullopt;
     auto token = reader.save();
 
-    if (!IsAlpha(reader.peek())) {
+    if (!ConsumeAlpha(reader)) {
         reader.restore(token);
         return false;
     }
 
-    // Reading ALPHA.
-    reader.next();
-
-    while (IsAlpha(reader.peek()) || IsDigit(reader.peek()) ||
-        reader.peek() == '+' || reader.peek() == '-' || reader.peek() == '.') {
-        reader.next();
+    while (ConsumeAlpha(reader) || ConsumeDigit(reader) ||
+        reader.consume('+') || reader.consume('-') || reader.consume('.')) {
     }
 
     value = reader.extract(token);
@@ -533,8 +513,7 @@ bool IPvFuture(TokenReader& reader) {
     }
 
     size_t repeat_counter = 0;
-    while (IsHexDigit(reader.peek())) {
-        reader.next();
+    while (ConsumeHexDigit(reader)) {
         repeat_counter += 1;
     }
 
@@ -549,9 +528,8 @@ bool IPvFuture(TokenReader& reader) {
     }
 
     repeat_counter = 0;
-    while (IsUnreserved(reader.peek()) || IsSubDelims(reader.peek()) ||
-        reader.peek() == ':') {
-        reader.next();
+    while (ConsumeUnreserved(reader) || ConsumeSubDelims(reader) ||
+        reader.consume(':')) {
         repeat_counter += 1;
     }
 
@@ -1078,7 +1056,7 @@ bool pathRootless(TokenReader& reader,
 
 // Always returns true as consumes 0 elements.
 // RFC3986: zero characters.
-bool pathEmpty(TokenReader& reader,
+bool pathEmpty(TokenReader&,
                std::optional<std::string>& value) {
     value = "";
     return true;
