@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(uric INTERFACE)
 
 target_sources(uric INTERFACE
+  # API implementation.
+  src/authority.cpp
+  src/uri.cpp
   # Token reader.
   src/token_reader.h
   # Uri parser.
@@ -39,6 +42,10 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(uric_tests
+  # API tests.
+  tests/authority_tests.cpp
+  tests/uri_tests.cpp
+  
   # Parser tests.
   #  Utils.
   tests/parser/utils/parser_test_utils.h
@@ -75,8 +82,6 @@ add_executable(uric_tests
   tests/parser/uri_parser_validation_uri.cpp
   tests/parser/uri_parser_validation_uriReference.cpp
   tests/parser/uri_parser_validation_userInfo.cpp
-
-  tests/uri_tests.cpp
 )
 
 target_link_libraries(uric_tests PRIVATE uric)

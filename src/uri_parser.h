@@ -13,7 +13,6 @@ namespace __internal {
 class TokenReader;
 
 // TODO(st235): leave only public API in header.
-// TODO(st235): collapse similar rules.
 
 // Entry-point tokens.
 // These tokens expect to match the
