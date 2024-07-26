@@ -165,7 +165,7 @@ Use these commands to build the project:
 
 ```bash
 mkdir build
-cmake ..
+cmake .. -DCOMPILE_TESTS=ON
 make
 ```
 

@@ -19,7 +19,8 @@ jobs:
         with:
           source-dir: ${{github.workspace}}
           build-dir: ${{github.workspace}}/build/
-          options: ASSERT=ON
+          options: |
+            COMPILE_TESTS=ON
 
       - name: Run tests
         working-directory: ${{github.workspace}}/build/
