@@ -22,6 +22,8 @@ constexpr char kQueryKeyValueSeparator = '=';
 
 class Url {
 public:
+    using query_params_t = std::unordered_map<std::string, std::string>;
+
     static std::optional<Url> parse(const std::string& input) {
         const auto& uri_opt = Uri::parse(input);
 
@@ -47,14 +49,16 @@ public:
     }
 
     explicit Url(const Uri& uri) noexcept:
-        _uri(uri) {
+        _uri(uri),
+        _query_params(Url::parseQueryParams(uri.getQuery())) {
         // Empty on purpose.
     }
 
     explicit Url(const std::string& path,
                  const optional_string_t& query = std::nullopt,
                  const optional_string_t& fragment = std::nullopt) noexcept:
-        _uri(path, query, fragment) {
+        _uri(path, query, fragment),
+        _query_params(Url::parseQueryParams(query)) {
         // Empty on purpose.
     }
 
@@ -63,7 +67,8 @@ public:
         const std::string& path,
         const optional_string_t& query = std::nullopt,
         const optional_string_t& fragment = std::nullopt) noexcept:
-        _uri(scheme, authority, path, query, fragment) {
+        _uri(scheme, authority, path, query, fragment),
+        _query_params(Url::parseQueryParams(query)) {
         // Empty on purpose.
     }
 
@@ -92,19 +97,28 @@ public:
         return _uri.getPath();
     }
 
-    inline const optional_string_t& getRawQuery() const {
-        return _uri.getQuery();
+    inline const query_params_t& getQuery() const {
+        return _query_params;
     }
 
-    std::unordered_map<std::string, std::string> getQuery() const {
-        std::unordered_map<std::string, std::string> queries;
-        const auto& raw_query_opt = getRawQuery();
+    inline const optional_string_t& getFragment() const {
+        return _uri.getFragment();
+    }
 
-        if (!raw_query_opt) {
+    ~Url() = default;
+
+private:
+    Uri _uri;
+    query_params_t _query_params;
+
+    static query_params_t parseQueryParams(const optional_string_t& raw_opt_query) {
+        if (!raw_opt_query) {
             return std::unordered_map<std::string, std::string>();
         }
 
-        const auto& raw_query = raw_query_opt.value();
+        std::unordered_map<std::string, std::string> queries;
+
+        const auto& raw_query = raw_opt_query.value();
 
         size_t i = 0;
         bool keyValueSeparatorFound = false;
@@ -152,15 +166,6 @@ public:
 
         return queries;
     }
-
-    inline const optional_string_t& getFragment() const {
-        return _uri.getFragment();
-    }
-
-    ~Url() = default;
-
-private:
-    Uri _uri;
 };
 
 } // namespace uri
