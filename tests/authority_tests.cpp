@@ -85,5 +85,6 @@ TEST_P(AuthorityTestingFixture, TestThatH16ParsingIsCorrect) {
     const auto& input = pair.first;
     const auto& expected_authority = pair.second;
 
-    EXPECT_EQ(Authority::parse(input).value(), expected_authority);
+    const auto& actual_authority = Authority::parse(input);
+    EXPECT_EQ(actual_authority.value(), expected_authority);
 }

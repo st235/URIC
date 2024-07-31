@@ -32,8 +32,8 @@ TEST_P(UrlQueryTestingFixture, TestThatH16ParsingIsCorrect) {
     const auto& pair = GetParam();
 
     const auto& input = pair.first;
-    const auto& url = Url::parse(input);
+    const auto& actual_url = Url::parse(input);
     const auto& expected_query_params = pair.second;
 
-    EXPECT_EQ(url.value().getQuery(), expected_query_params);
+    EXPECT_EQ(actual_url.value().getQuery(), expected_query_params);
 }
