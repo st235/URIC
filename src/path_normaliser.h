@@ -98,7 +98,8 @@ uint8_t ConvertCharHexToDecim(char d) {
 }
 
 char ConvertHexToChar(uint16_t d) {
-    if (d >= 0 && d <= 9) {
+    // d <= 0 has been implicity assumed.
+    if (d <= 9) {
         return static_cast<char>(d + '0');
     } else if (d == 10) {
         return 'A';
