@@ -1,7 +1,8 @@
 #include "uri.h"
 
-#include "uri_parser.h"
+#include "path_normaliser.h"
 #include "token_reader.h"
+#include "uri_parser.h"
 
 namespace uri {
 
@@ -77,6 +78,11 @@ std::optional<Uri> Uri::fromParts(const std::string& raw_path,
     }
 
     return Uri(outScheme, outAuthority, outPath.value(), outQuery, outFragment);
+}
+
+std::string Uri::normalisePath(const std::string& path) {
+    PathNormaliser normaliser(path);
+    return normaliser.normalise();
 }
 
 } // namepsace uri

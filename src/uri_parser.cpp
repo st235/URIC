@@ -26,15 +26,6 @@ bool IsSubDelims(char c) {
            (c == ',') || (c == ';') || (c == '=');
 }
 
-// bool IsGenDelims(char c) {
-//     return (c == ':') || (c == '/') || (c == '?') || (c == '#') ||
-//            (c == '[') || (c == ']') || (c == '@');
-// }
-
-// bool IsReserved(char c) {
-//     return IsGenDelims(c) || IsSubDelims(c);
-// }
-
 bool IsUnreserved(char c) {
     return IsAlpha(c) || IsDigit(c) ||
            (c == '-') || (c == '.') ||

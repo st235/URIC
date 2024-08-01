@@ -22,6 +22,7 @@ public:
                                         const optional_string_t& raw_authority,
                                         const optional_string_t& raw_query,
                                         const optional_string_t& raw_fragment);
+    static std::string normalisePath(const std::string& path);
 
     explicit Uri(const std::string& path,
                  const optional_string_t& query = std::nullopt,
