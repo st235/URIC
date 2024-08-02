@@ -7,11 +7,11 @@
 #include "path_utils.h"
 
 using TestPayload = std::pair<std::string, std::string>;
-class PathNormaliserCodeIfNecessaryTestingFixture: public ::testing::TestWithParam<TestPayload> {};
+class PathUtilsCodeIfNecessaryTestingFixture: public ::testing::TestWithParam<TestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
-        PathNormaliserTests,
-        PathNormaliserCodeIfNecessaryTestingFixture,
+        PathUtilsTests,
+        PathUtilsCodeIfNecessaryTestingFixture,
         ::testing::Values(
             std::make_pair("", ""),
             std::make_pair("a", "a"),
@@ -35,7 +35,7 @@ INSTANTIATE_TEST_SUITE_P(
         )
 );
 
-TEST_P(PathNormaliserCodeIfNecessaryTestingFixture, CodeIfNecessaryReturnsRightSegmentation) {
+TEST_P(PathUtilsCodeIfNecessaryTestingFixture, CodeIfNecessaryReturnsRightSegmentation) {
     const auto& pair = GetParam();
 
     const auto& path = pair.first;

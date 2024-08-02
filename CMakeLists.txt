@@ -52,6 +52,7 @@ if (COMPILE_TESTS)
 
     # Path normalisation tests.
     tests/path_utils_CodeIfNecessary.cpp
+    tests/path_utils_Normalise.cpp
     tests/path_utils_RemoveDotSegments.cpp
     tests/path_utils_SplitHierarchicalSegments.cpp
     

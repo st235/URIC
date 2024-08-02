@@ -9,11 +9,11 @@
 using segments_t = std::vector<std::string>;
 
 using TestPayload = std::pair<segments_t, segments_t>;
-class PathNormaliserRemoveDotSegmentsTestingFixture: public ::testing::TestWithParam<TestPayload> {};
+class PathUtilsRemoveDotSegmentsTestingFixture: public ::testing::TestWithParam<TestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
-        PathNormaliserTests,
-        PathNormaliserRemoveDotSegmentsTestingFixture,
+        PathUtilsTests,
+        PathUtilsRemoveDotSegmentsTestingFixture,
         ::testing::Values(
             std::make_pair(segments_t({ { "" } }), segments_t({ { "" } })),
             std::make_pair(segments_t({ { "abcd" } }), segments_t({ { "abcd" } })),
@@ -28,7 +28,7 @@ INSTANTIATE_TEST_SUITE_P(
         )
 );
 
-TEST_P(PathNormaliserRemoveDotSegmentsTestingFixture, RemoveDotSegmentsReturnsRightSegmentation) {
+TEST_P(PathUtilsRemoveDotSegmentsTestingFixture, RemoveDotSegmentsReturnsRightSegmentation) {
     const auto& pair = GetParam();
 
     const auto& input = pair.first;

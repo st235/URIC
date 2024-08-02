@@ -37,6 +37,11 @@ bool IsGenDelims(char c) {
            (c == '[') || (c == ']') || (c == '@');
 }
 
+bool IsUnreservedSpecial(char c) {
+    return (c == '-') || (c == '.') ||
+           (c == '_') || (c == '~');
+}
+
 bool IsReserved(char c) {
     return IsGenDelims(c) || IsSubDelims(c);
 }
@@ -66,7 +71,9 @@ bool ShouldDecode(uint16_t pct_encoded) {
 
 bool ShouldEncode(char symbol) {
     if (IsAlpha(symbol) ||
+        // Includes check for digits.
         IsHexDigit(symbol) ||
+        IsUnreservedSpecial(symbol) ||
         IsReserved(symbol)) {
         return false;
     }

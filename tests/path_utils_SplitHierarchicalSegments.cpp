@@ -9,11 +9,11 @@
 using segments_t = std::vector<std::string>;
 
 using TestPayload = std::pair<std::string, segments_t>;
-class PathNormaliserGetHierarchicalSegmentsTestingFixture: public ::testing::TestWithParam<TestPayload> {};
+class PathUtilsGetHierarchicalSegmentsTestingFixture: public ::testing::TestWithParam<TestPayload> {};
 
 INSTANTIATE_TEST_SUITE_P(
-        PathNormaliserTests,
-        PathNormaliserGetHierarchicalSegmentsTestingFixture,
+        PathUtilsTests,
+        PathUtilsGetHierarchicalSegmentsTestingFixture,
         ::testing::Values(
             std::make_pair("", segments_t({ { "" } })),
             std::make_pair("abcd", segments_t({ { "abcd" } })),
@@ -26,7 +26,7 @@ INSTANTIATE_TEST_SUITE_P(
         )
 );
 
-TEST_P(PathNormaliserGetHierarchicalSegmentsTestingFixture, GetHierarchicalSegmentsReturnsRightSegmentation) {
+TEST_P(PathUtilsGetHierarchicalSegmentsTestingFixture, GetHierarchicalSegmentsReturnsRightSegmentation) {
     const auto& pair = GetParam();
 
     const auto& input = pair.first;
