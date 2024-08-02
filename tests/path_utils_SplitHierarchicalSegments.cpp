@@ -4,9 +4,7 @@
 #include <utility>
 #include <vector>
 
-#include "path_normaliser.h"
-
-using uri::PathNormaliser;
+#include "path_utils.h"
 
 using segments_t = std::vector<std::string>;
 
@@ -34,5 +32,5 @@ TEST_P(PathNormaliserGetHierarchicalSegmentsTestingFixture, GetHierarchicalSegme
     const auto& input = pair.first;
     const auto& expected_segments = pair.second;
 
-    EXPECT_EQ(PathNormaliser::getHierarchicalSegments(input), expected_segments);
+    EXPECT_EQ(uri::path::SplitHierarchicalSegments(input), expected_segments);
 }

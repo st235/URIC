@@ -13,8 +13,9 @@ target_sources(uric INTERFACE
   # API implementation.
   src/authority.cpp
   src/uri.cpp
-  # Normalisation algorithms.
-  src/path_normaliser.h
+  # Path normalisation algorithms.
+  src/path_utils.h
+  src/path_utils.cpp
   # Token reader.
   src/token_reader.h
   # Uri parser.
@@ -50,9 +51,9 @@ if (COMPILE_TESTS)
     tests/url_tests.cpp
 
     # Path normalisation tests.
-    tests/path_normaliser_getHierarchicalSegments.cpp
-    tests/path_normaliser_removeDotSegments.cpp
-    tests/path_normaliser_codeIfNecessary.cpp
+    tests/path_utils_CodeIfNecessary.cpp
+    tests/path_utils_RemoveDotSegments.cpp
+    tests/path_utils_SplitHierarchicalSegments.cpp
     
     # Parser tests.
     #  Utils.

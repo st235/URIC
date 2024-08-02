@@ -1292,7 +1292,7 @@ TEST_P(UriParserUriTestingFixture, TestThatUriParsingIsCorrect) {
     uri::__internal::TokenReader reader(original_text);
 
     EXPECT_EQ(
-        uri::__internal::uri(reader,
+        uri::__internal::Uri(reader,
             parsed_scheme,
             parsed_userInfo, parsed_host, parsed_port, parsed_path,
             parsed_query, parsed_fragment), expected_status);

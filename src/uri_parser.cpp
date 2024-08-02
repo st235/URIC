@@ -79,7 +79,7 @@ namespace uri {
 
 namespace __internal {
 
-bool uriReference(TokenReader& reader,
+bool UriReference(TokenReader& reader,
                   std::optional<std::string>& outScheme,
                   std::optional<std::string>& outUserInfo,
                   std::optional<std::string>& outHost,
@@ -89,7 +89,7 @@ bool uriReference(TokenReader& reader,
                   std::optional<std::string>& outFragment) {
     auto token = reader.save();
 
-    if (uri(reader, outScheme,
+    if (Uri(reader, outScheme,
             outUserInfo, outHost, outPort,
             outPath, outQuery, outFragment) ||
         relativeRef(reader,
@@ -113,7 +113,7 @@ bool uriReference(TokenReader& reader,
     return false;
 }
 
-bool uri(TokenReader& reader,
+bool Uri(TokenReader& reader,
          std::optional<std::string>& outScheme,
          std::optional<std::string>& outUserInfo,
          std::optional<std::string>& outHost,
@@ -159,7 +159,7 @@ bool uri(TokenReader& reader,
     return false;
 }
 
-bool absoluteUri(TokenReader& reader,
+bool AbsoluteUri(TokenReader& reader,
                  std::optional<std::string>& outScheme,
                  std::optional<std::string>& outUserInfo,
                  std::optional<std::string>& outHost,
@@ -205,7 +205,7 @@ bool absoluteUri(TokenReader& reader,
 //      / path-noscheme   ; begins with a non-colon segment
 //      / path-rootless   ; begins with a segment
 //      / path-empty      ; zero characters
-bool path(TokenReader& reader,
+bool Path(TokenReader& reader,
           std::optional<std::string>& value) {
     auto token = reader.save();
 
