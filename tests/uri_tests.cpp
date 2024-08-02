@@ -102,5 +102,6 @@ TEST_P(UriTestingFixture, TestThatH16ParsingIsCorrect) {
     const auto& input = pair.first;
     const auto& expected_uri = pair.second;
 
-    EXPECT_EQ(Uri::parse(input).value(), expected_uri);
+    const auto& actual_uri = Uri::parse(input);
+    EXPECT_EQ(actual_uri.value(), expected_uri);
 }

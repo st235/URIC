@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.26)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(URIC VERSION 0.9.0 DESCRIPTION "A Uniform Resource Identifier (URI) implementation in C++, designed strictly in compliance with RFC 3986.")
+project(URIC VERSION 0.9.1 DESCRIPTION "A Uniform Resource Identifier (URI) implementation in C++, designed strictly in compliance with RFC 3986.")
 
 # Library targets.
 
@@ -13,6 +13,9 @@ target_sources(uric INTERFACE
   # API implementation.
   src/authority.cpp
   src/uri.cpp
+  # Path normalisation algorithms.
+  src/path_utils.h
+  src/path_utils.cpp
   # Token reader.
   src/token_reader.h
   # Uri parser.
@@ -46,6 +49,12 @@ if (COMPILE_TESTS)
     tests/authority_tests.cpp
     tests/uri_tests.cpp
     tests/url_tests.cpp
+
+    # Path normalisation tests.
+    tests/path_utils_CodeIfNecessary.cpp
+    tests/path_utils_Normalise.cpp
+    tests/path_utils_RemoveDotSegments.cpp
+    tests/path_utils_SplitHierarchicalSegments.cpp
     
     # Parser tests.
     #  Utils.

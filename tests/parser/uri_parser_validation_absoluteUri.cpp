@@ -91,7 +91,7 @@ TEST_P(UriParserAbsoluteUriTestingFixture, TestThatAbsoluteUriParsingIsCorrect) 
     uri::__internal::TokenReader reader(original_text);
 
     EXPECT_EQ(
-        uri::__internal::absoluteUri(reader,
+        uri::__internal::AbsoluteUri(reader,
             parsed_scheme,
             parsed_userInfo, parsed_host, parsed_port, parsed_path,
             parsed_query), expected_status);

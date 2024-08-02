@@ -1,7 +1,8 @@
 #include "uri.h"
 
-#include "uri_parser.h"
+#include "path_utils.h"
 #include "token_reader.h"
+#include "uri_parser.h"
 
 namespace uri {
 
@@ -15,7 +16,7 @@ std::optional<Uri> Uri::parse(const std::string& input) {
     optional_string_t outPath;
     optional_string_t outQuery;
     optional_string_t outFragment;
-    uriReference(reader, outScheme, 
+    UriReference(reader, outScheme, 
                  outUserInfo, outHost, outPort,
                  outPath,
                  outQuery, outFragment);
@@ -44,7 +45,7 @@ std::optional<Uri> Uri::fromParts(const std::string& raw_path,
     optional_string_t outFragment;
 
     __internal::TokenReader pathReader(raw_path);
-    if (!path(pathReader, outPath) || pathReader.hasNext()) {
+    if (!Path(pathReader, outPath) || pathReader.hasNext()) {
         return std::nullopt;
     }
 
@@ -77,6 +78,10 @@ std::optional<Uri> Uri::fromParts(const std::string& raw_path,
     }
 
     return Uri(outScheme, outAuthority, outPath.value(), outQuery, outFragment);
+}
+
+std::string Uri::normalisePath(const std::string& path) {
+    return path::Normalise(path);
 }
 
 } // namepsace uri

@@ -18,7 +18,7 @@ class TokenReader;
 // These tokens expect to match the
 // entire string: from the begging till the end.
 
-bool uriReference(TokenReader& reader,
+bool UriReference(TokenReader& reader,
                   std::optional<std::string>& outScheme,
                   std::optional<std::string>& outUserInfo,
                   std::optional<std::string>& outHost,
@@ -27,7 +27,7 @@ bool uriReference(TokenReader& reader,
                   std::optional<std::string>& outQuery,
                   std::optional<std::string>& outFragment);
 
-bool uri(TokenReader& reader,
+bool Uri(TokenReader& reader,
          std::optional<std::string>& outScheme,
          std::optional<std::string>& outUserInfo,
          std::optional<std::string>& outHost,
@@ -36,7 +36,7 @@ bool uri(TokenReader& reader,
          std::optional<std::string>& outQuery,
          std::optional<std::string>& outFragment);
 
-bool absoluteUri(TokenReader& reader,
+bool AbsoluteUri(TokenReader& reader,
                  std::optional<std::string>& outScheme,
                  std::optional<std::string>& outUserInfo,
                  std::optional<std::string>& outHost,
@@ -44,7 +44,7 @@ bool absoluteUri(TokenReader& reader,
                  std::optional<std::string>& outPath,
                  std::optional<std::string>& outQuery);
 
-bool path(TokenReader& reader,
+bool Path(TokenReader& reader,
           std::optional<std::string>& outValue);
 
 // Internal tokens (sorted by importance).

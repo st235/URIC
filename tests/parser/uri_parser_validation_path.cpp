@@ -49,6 +49,6 @@ TEST_P(UriParserPathTestingFixture, TestThatPathParsingIsCorrect) {
     std::optional<std::string> parsed_value;
     uri::__internal::TokenReader reader(original_text);
 
-    EXPECT_EQ(uri::__internal::path(reader, parsed_value), expected_status);
+    EXPECT_EQ(uri::__internal::Path(reader, parsed_value), expected_status);
     EXPECT_EQ(parsed_value, expected_text);
 }

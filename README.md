@@ -70,7 +70,25 @@ if (uri.getAuthority()) {
 }
 ```
 
-### Grammar
+### Normalisation
+
+The library provides handy methods for path normalisation, according to the `RFC 3986`.
+
+The rules are:
+
+- The following unreserved characters are percent decoded:
+    - Alphabetical characters: `a-z`, `A-Z` (decoded from `%41`-`%5A` and `%61`-`%7A`)
+    - Digit characters: `0-9` (decoded from `%30`-`%39`)
+    - hyphen '-' (`%2D`), period '.' (`%2E`), underscore '_' (`%5F`), and tilde '~' (`%7E`)
+- These reserved characters are not encoded or decoded: `: / ? # [ ] @ ! $ & ' ( ) * + , ; =`
+- Other characters, for example literal byte values, are percent encoded.
+- Percent encoded representations are converted to upper case.
+- Paths are normalized according to the Remove Dot Segments protocol.
+
+>[!NOTE]
+> Use `Uri::normalisePath` to perform path normalisation.
+
+## Grammar
 
 >[!NOTE]
 > URI Grammar for future reference, see `RFC 3986` for more details.
