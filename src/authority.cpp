@@ -10,8 +10,9 @@ std::optional<Authority> Authority::parse(const std::string& input) {
 
     optional_string_t outUserInfo;
     optional_string_t outHost;
+    std::optional<__internal::HostType> outHostType;
     optional_string_t outPort;
-    authority(reader, outUserInfo, outHost, outPort);
+    authority(reader, outUserInfo, outHost, outHostType, outPort);
 
     if (reader.hasNext() || !outHost) {
         return std::nullopt;

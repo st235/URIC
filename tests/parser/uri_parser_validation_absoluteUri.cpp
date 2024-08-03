@@ -78,6 +78,7 @@ TEST_P(UriParserAbsoluteUriTestingFixture, TestThatAbsoluteUriParsingIsCorrect) 
     const auto& expected_scheme = authority_payload.expected_scheme;
     const auto& expected_userInfo = authority_payload.expected_userInfo;
     const auto& expected_host = authority_payload.expected_host;
+    const auto& expected_host_type = authority_payload.expected_host_type;
     const auto& expected_port = authority_payload.expected_port;
     const auto& expected_path = authority_payload.expected_path;
     const auto& expected_query = authority_payload.expected_query;
@@ -85,6 +86,7 @@ TEST_P(UriParserAbsoluteUriTestingFixture, TestThatAbsoluteUriParsingIsCorrect) 
     std::optional<std::string> parsed_scheme;
     std::optional<std::string> parsed_userInfo;
     std::optional<std::string> parsed_host;
+    std::optional<uri::__internal::HostType> parsed_host_type;
     std::optional<std::string> parsed_port;
     std::optional<std::string> parsed_path;
     std::optional<std::string> parsed_query;
@@ -93,12 +95,13 @@ TEST_P(UriParserAbsoluteUriTestingFixture, TestThatAbsoluteUriParsingIsCorrect) 
     EXPECT_EQ(
         uri::__internal::AbsoluteUri(reader,
             parsed_scheme,
-            parsed_userInfo, parsed_host, parsed_port, parsed_path,
+            parsed_userInfo, parsed_host, parsed_host_type, parsed_port, parsed_path,
             parsed_query), expected_status);
 
     EXPECT_EQ(parsed_scheme, expected_scheme);
     EXPECT_EQ(parsed_userInfo, expected_userInfo);
     EXPECT_EQ(parsed_host, expected_host);
+    EXPECT_EQ(parsed_host_type, expected_host_type);
     EXPECT_EQ(parsed_port, expected_port);
     EXPECT_EQ(parsed_path, expected_path);
     EXPECT_EQ(parsed_query, expected_query);

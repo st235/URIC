@@ -12,6 +12,12 @@ namespace __internal {
 
 class TokenReader;
 
+enum class HostType {
+    kIPLiteral = 0,
+    kIPv4 = 1,
+    kRegName = 2
+};
+
 // TODO(st235): leave only public API in header.
 
 // Entry-point tokens.
@@ -22,6 +28,7 @@ bool UriReference(TokenReader& reader,
                   std::optional<std::string>& outScheme,
                   std::optional<std::string>& outUserInfo,
                   std::optional<std::string>& outHost,
+                  std::optional<HostType>& outHostType,
                   std::optional<std::string>& outPort,
                   std::optional<std::string>& outPath,
                   std::optional<std::string>& outQuery,
@@ -31,6 +38,7 @@ bool Uri(TokenReader& reader,
          std::optional<std::string>& outScheme,
          std::optional<std::string>& outUserInfo,
          std::optional<std::string>& outHost,
+         std::optional<HostType>& outHostType,
          std::optional<std::string>& outPort,
          std::optional<std::string>& outPath,
          std::optional<std::string>& outQuery,
@@ -40,6 +48,7 @@ bool AbsoluteUri(TokenReader& reader,
                  std::optional<std::string>& outScheme,
                  std::optional<std::string>& outUserInfo,
                  std::optional<std::string>& outHost,
+                 std::optional<HostType>& outHostType,
                  std::optional<std::string>& outPort,
                  std::optional<std::string>& outPath,
                  std::optional<std::string>& outQuery);
@@ -53,7 +62,8 @@ bool scheme(TokenReader& reader,
             std::optional<std::string>& outValue);
 
 bool host(TokenReader& reader,
-          std::optional<std::string>& outValue);
+          std::optional<std::string>& outHost,
+          std::optional<HostType>& outHostType);
 
 bool queryFragment(TokenReader& reader,
                    std::optional<std::string>& outValue);
@@ -61,12 +71,14 @@ bool queryFragment(TokenReader& reader,
 bool hierPart(TokenReader& reader,
               std::optional<std::string>& outUserInfo,
               std::optional<std::string>& outHost,
+              std::optional<HostType>& outHostType,
               std::optional<std::string>& outPort,
               std::optional<std::string>& outPath);
 
 bool relativeRef(TokenReader& reader,
                  std::optional<std::string>& outUserInfo,
                  std::optional<std::string>& outHost,
+                 std::optional<HostType>& outHostType,
                  std::optional<std::string>& outPort,
                  std::optional<std::string>& outPath,
                  std::optional<std::string>& outQuery,
@@ -75,12 +87,14 @@ bool relativeRef(TokenReader& reader,
 bool relativePart(TokenReader& reader,
                   std::optional<std::string>& outUserInfo,
                   std::optional<std::string>& outHost,
+                  std::optional<HostType>& outHostType,
                   std::optional<std::string>& outPort,
                   std::optional<std::string>& outPath);
 
 bool authority(TokenReader& reader,
                std::optional<std::string>& outUserInfo,
                std::optional<std::string>& outHost,
+               std::optional<HostType>& outHostType,
                std::optional<std::string>& outPort);
 
 bool userInfo(TokenReader& reader,

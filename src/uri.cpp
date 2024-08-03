@@ -12,12 +12,13 @@ std::optional<Uri> Uri::parse(const std::string& input) {
     optional_string_t outScheme;
     optional_string_t outUserInfo;
     optional_string_t outHost;
+    std::optional<__internal::HostType> outHostType;
     optional_string_t outPort;
     optional_string_t outPath;
     optional_string_t outQuery;
     optional_string_t outFragment;
     UriReference(reader, outScheme, 
-                 outUserInfo, outHost, outPort,
+                 outUserInfo, outHost, outHostType, outPort,
                  outPath,
                  outQuery, outFragment);
 

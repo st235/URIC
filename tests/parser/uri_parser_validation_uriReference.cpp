@@ -23,26 +23,26 @@ INSTANTIATE_TEST_SUITE_P(
 
             UriTestPayload::success("http://34.159.184.124/tag/wp-content/posts?filter=active")
                 .expectScheme("http")
-                .expectHost("34.159.184.124")
+                .expectHost("34.159.184.124", uri::__internal::HostType::kIPv4)
                 .expectPath("/tag/wp-content/posts")
                 .expectQuery("filter=active"),
 
             UriTestPayload::success("http://93.235.104.52:42560/search/blog/tags/blog#footer")
                 .expectScheme("http")
-                .expectHost("93.235.104.52")
+                .expectHost("93.235.104.52", uri::__internal::HostType::kIPv4)
                 .expectPort("42560")
                 .expectPath("/search/blog/tags/blog")
                 .expectFragment("footer"),
 
             UriTestPayload::success("http://152.35.176.42/list/app/wp-content#section2")
                 .expectScheme("http")
-                .expectHost("152.35.176.42")
+                .expectHost("152.35.176.42", uri::__internal::HostType::kIPv4)
                 .expectPath("/list/app/wp-content")
                 .expectFragment("section2"),
 
             UriTestPayload::success("http://[8bd1:bbfa:fbee:9799:a368:e0b7:d214:75cb]/categories/list?id=123")
                 .expectScheme("http")
-                .expectHost("8bd1:bbfa:fbee:9799:a368:e0b7:d214:75cb")
+                .expectHost("8bd1:bbfa:fbee:9799:a368:e0b7:d214:75cb", uri::__internal::HostType::kIPLiteral)
                 .expectPath("/categories/list")
                 .expectQuery("id=123"),
 
@@ -54,7 +54,7 @@ INSTANTIATE_TEST_SUITE_P(
 
             UriTestPayload::success("http://135.3.47.89:19900/category/app/app/categories/wp-content?name=test#home")
                 .expectScheme("http")
-                .expectHost("135.3.47.89")
+                .expectHost("135.3.47.89", uri::__internal::HostType::kIPv4)
                 .expectPort("19900")
                 .expectPath("/category/app/app/categories/wp-content")
                 .expectQuery("name=test")
@@ -62,14 +62,14 @@ INSTANTIATE_TEST_SUITE_P(
 
             UriTestPayload::success("http://178.108.232.60/tags/list/explore?id=123#about")
                 .expectScheme("http")
-                .expectHost("178.108.232.60")
+                .expectHost("178.108.232.60", uri::__internal::HostType::kIPv4)
                 .expectPath("/tags/list/explore")
                 .expectQuery("id=123")
                 .expectFragment("about"),
 
             UriTestPayload::success("http://45.211.216.208/list/posts?name=test#home")
                 .expectScheme("http")
-                .expectHost("45.211.216.208")
+                .expectHost("45.211.216.208", uri::__internal::HostType::kIPv4)
                 .expectPath("/list/posts")
                 .expectQuery("name=test")
                 .expectFragment("home"),
@@ -82,55 +82,55 @@ INSTANTIATE_TEST_SUITE_P(
 
             UriTestPayload::success("http://128.235.96.110/tags/category?name=test")
                 .expectScheme("http")
-                .expectHost("128.235.96.110")
+                .expectHost("128.235.96.110", uri::__internal::HostType::kIPv4)
                 .expectPath("/tags/category")
                 .expectQuery("name=test"),
 
             UriTestPayload::success("//164.243.116.133/app/list/list/explore#footer")
-                .expectHost("164.243.116.133")
+                .expectHost("164.243.116.133", uri::__internal::HostType::kIPv4)
                 .expectPath("/app/list/list/explore")
                 .expectFragment("footer"),
 
             UriTestPayload::success("//173.161.162.64/list/tag?filter=active#section1")
-                .expectHost("173.161.162.64")
+                .expectHost("173.161.162.64", uri::__internal::HostType::kIPv4)
                 .expectPath("/list/tag")
                 .expectQuery("filter=active")
                 .expectFragment("section1"),
 
             UriTestPayload::success("//71.219.19.61/blog/tags/category/app/explore")
-                .expectHost("71.219.19.61")
+                .expectHost("71.219.19.61", uri::__internal::HostType::kIPv4)
                 .expectPath("/blog/tags/category/app/explore"),
 
             UriTestPayload::success("//[9ae3:5ac4:30fe:9024:328f:dcd7:52ac:b87a]/app")
-                .expectHost("9ae3:5ac4:30fe:9024:328f:dcd7:52ac:b87a")
+                .expectHost("9ae3:5ac4:30fe:9024:328f:dcd7:52ac:b87a", uri::__internal::HostType::kIPLiteral)
                 .expectPath("/app"),
 
             UriTestPayload::success("//208.50.229.245/main/search/posts/tags/tag?q=keyword#section1")
-                .expectHost("208.50.229.245")
+                .expectHost("208.50.229.245", uri::__internal::HostType::kIPv4)
                 .expectPath("/main/search/posts/tags/tag")
                 .expectQuery("q=keyword")
                 .expectFragment("section1"),
 
             UriTestPayload::success("//[f030:82ad:9392:b56:f172:66f7:5c2b:2083]/category/posts/blog?search=query#contact")
-                .expectHost("f030:82ad:9392:b56:f172:66f7:5c2b:2083")
+                .expectHost("f030:82ad:9392:b56:f172:66f7:5c2b:2083", uri::__internal::HostType::kIPLiteral)
                 .expectPath("/category/posts/blog")
                 .expectQuery("search=query")
                 .expectFragment("contact"),
 
             UriTestPayload::success("//11.153.210.178:21253/blog/posts?beginner=brass&art=bone#home")
-                .expectHost("11.153.210.178")
+                .expectHost("11.153.210.178", uri::__internal::HostType::kIPv4)
                 .expectPort("21253")
                 .expectPath("/blog/posts")
                 .expectQuery("beginner=brass&art=bone")
                 .expectFragment("home"),
 
             UriTestPayload::success("//212.224.97.107:54858/main")
-                .expectHost("212.224.97.107")
+                .expectHost("212.224.97.107", uri::__internal::HostType::kIPv4)
                 .expectPort("54858")
                 .expectPath("/main"),
 
             UriTestPayload::success("//[2ce3:abf7:2741:777d:daf5:9bb6:3df:9a28]/explore/tag/main/posts/main")
-                .expectHost("2ce3:abf7:2741:777d:daf5:9bb6:3df:9a28")
+                .expectHost("2ce3:abf7:2741:777d:daf5:9bb6:3df:9a28", uri::__internal::HostType::kIPLiteral)
                 .expectPath("/explore/tag/main/posts/main"),
 
             UriTestPayload::success("//garcia-washington.net/tags/main")
@@ -231,6 +231,7 @@ TEST_P(UriParserUriReferenceTestingFixture, TestThatUriParsingIsCorrect) {
     const auto& expected_scheme = authority_payload.expected_scheme;
     const auto& expected_userInfo = authority_payload.expected_userInfo;
     const auto& expected_host = authority_payload.expected_host;
+    const auto& expected_host_type = authority_payload.expected_host_type;
     const auto& expected_port = authority_payload.expected_port;
     const auto& expected_path = authority_payload.expected_path;
     const auto& expected_query = authority_payload.expected_query;
@@ -239,6 +240,7 @@ TEST_P(UriParserUriReferenceTestingFixture, TestThatUriParsingIsCorrect) {
     std::optional<std::string> parsed_scheme;
     std::optional<std::string> parsed_userInfo;
     std::optional<std::string> parsed_host;
+    std::optional<uri::__internal::HostType> parsed_host_type;
     std::optional<std::string> parsed_port;
     std::optional<std::string> parsed_path;
     std::optional<std::string> parsed_query;
@@ -248,12 +250,14 @@ TEST_P(UriParserUriReferenceTestingFixture, TestThatUriParsingIsCorrect) {
     EXPECT_EQ(
         uri::__internal::UriReference(reader,
             parsed_scheme,
-            parsed_userInfo, parsed_host, parsed_port, parsed_path,
+            parsed_userInfo, parsed_host, parsed_host_type, parsed_port,
+            parsed_path,
             parsed_query, parsed_fragment), expected_status);
 
     EXPECT_EQ(parsed_scheme, expected_scheme);
     EXPECT_EQ(parsed_userInfo, expected_userInfo);
     EXPECT_EQ(parsed_host, expected_host);
+    EXPECT_EQ(parsed_host_type, expected_host_type);
     EXPECT_EQ(parsed_port, expected_port);
     EXPECT_EQ(parsed_path, expected_path);
     EXPECT_EQ(parsed_query, expected_query);

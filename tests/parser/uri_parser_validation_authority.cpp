@@ -29,7 +29,7 @@ INSTANTIATE_TEST_SUITE_P(
             UriTestPayload::success("port.net:").expectHost("port.net").expectPort(""),
             UriTestPayload::success("st235@website.com").expectUserInfo("st235").expectHost("website.com"),
             UriTestPayload::success("text:hello@website.net").expectUserInfo("text:hello").expectHost("website.net"),
-            UriTestPayload::success("192.168.1.1:3036").expectHost("192.168.1.1").expectPort("3036"),
+            UriTestPayload::success("192.168.1.1:3036").expectHost("192.168.1.1", uri::__internal::HostType::kIPv4).expectPort("3036"),
             UriTestPayload::success("st235@localhost:80").expectUserInfo("st235").expectHost("localhost").expectPort("80"),
             UriTestPayload::success("reallylong=userinfo+.:text@port.net:")
                 .expectUserInfo("reallylong=userinfo+.:text")
@@ -59,21 +59,24 @@ TEST_P(UriParserAuthorityTestingFixture, TestThatAuthorityParsingIsCorrect) {
     const auto& expected_status = authority_payload.expected_status;
     const auto& expected_userInfo = authority_payload.expected_userInfo;
     const auto& expected_host = authority_payload.expected_host;
+    const auto& expected_host_type = authority_payload.expected_host_type;
     const auto& expected_port = authority_payload.expected_port;
 
     std::optional<std::string> parsed_userInfo;
     std::optional<std::string> parsed_host;
+    std::optional<uri::__internal::HostType> parsed_host_type;
     std::optional<std::string> parsed_port;
     uri::__internal::TokenReader reader(original_text);
 
     EXPECT_EQ(
-        uri::__internal::authority(reader, parsed_userInfo, parsed_host, parsed_port) &&
+        uri::__internal::authority(reader, parsed_userInfo, parsed_host, parsed_host_type, parsed_port) &&
         !reader.hasNext(), expected_status);
 
     // Check only fully matched inputs.
     if (!reader.hasNext()) {
         EXPECT_EQ(parsed_userInfo, expected_userInfo);
         EXPECT_EQ(parsed_host, expected_host);
+        EXPECT_EQ(parsed_host_type, expected_host_type);
         EXPECT_EQ(parsed_port, expected_port);
     }
 }

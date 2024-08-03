@@ -61,23 +61,26 @@ TEST_P(UriParserRelativePartTestingFixture, TestThatRelativePartParsingIsCorrect
     const auto& expected_status = authority_payload.expected_status;
     const auto& expected_userInfo = authority_payload.expected_userInfo;
     const auto& expected_host = authority_payload.expected_host;
+    const auto& expected_host_type = authority_payload.expected_host_type;
     const auto& expected_port = authority_payload.expected_port;
     const auto& expected_path = authority_payload.expected_path;
 
     std::optional<std::string> parsed_userInfo;
     std::optional<std::string> parsed_host;
+    std::optional<uri::__internal::HostType> parsed_host_type;
     std::optional<std::string> parsed_port;
     std::optional<std::string> parsed_path;
     uri::__internal::TokenReader reader(original_text);
 
     EXPECT_EQ(
-        uri::__internal::relativePart(reader, parsed_userInfo, parsed_host, parsed_port, parsed_path) &&
+        uri::__internal::relativePart(reader, parsed_userInfo, parsed_host, parsed_host_type, parsed_port, parsed_path) &&
         !reader.hasNext(), expected_status);
 
     // Check only fully matched inputs.
     if (!reader.hasNext()) {
         EXPECT_EQ(parsed_userInfo, expected_userInfo);
         EXPECT_EQ(parsed_host, expected_host);
+        EXPECT_EQ(parsed_host_type, expected_host_type);
         EXPECT_EQ(parsed_port, expected_port);
         EXPECT_EQ(parsed_path, expected_path);
     }
