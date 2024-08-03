@@ -11,6 +11,8 @@ using optional_string_t = std::optional<std::string>;
 
 constexpr char kUserInfoSeparator = '@';
 constexpr char kPortSeparator = ':';
+constexpr char kIPLiteralBegin = '[';
+constexpr char kIPLiteralEnd = ']';
 
 } // namespace
 
@@ -53,13 +55,13 @@ public:
         }
 
         if (that._is_host_ip_literal) {
-            stream << '[';
+            stream << kIPLiteralBegin;
         }
 
         stream << that._host;
 
         if (that._is_host_ip_literal) {
-            stream << ']';
+            stream << kIPLiteralEnd;
         }
 
         if (that._port) {
