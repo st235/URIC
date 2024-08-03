@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.26)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(URIC VERSION 0.9.1 DESCRIPTION "A Uniform Resource Identifier (URI) implementation in C++, designed strictly in compliance with RFC 3986.")
+project(URIC VERSION 0.9.2 DESCRIPTION "A Uniform Resource Identifier (URI) implementation in C++, designed strictly in compliance with RFC 3986.")
 
 # Library targets.
 
