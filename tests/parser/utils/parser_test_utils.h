@@ -5,6 +5,8 @@
 #include <string>
 #include <ostream>
 
+#include "uri_parser.h"
+
 namespace tests {
 
 struct ParserTestPayload {
@@ -36,6 +38,7 @@ struct UriTestPayload {
     std::optional<std::string> expected_scheme;
     std::optional<std::string> expected_userInfo;
     std::optional<std::string> expected_host;
+    std::optional<uri::__internal::HostType> expected_host_type;
     std::optional<std::string> expected_port;
     std::optional<std::string> expected_path;
     std::optional<std::string> expected_query;
@@ -48,6 +51,7 @@ struct UriTestPayload {
         expected_scheme(std::nullopt),
         expected_userInfo(std::nullopt),
         expected_host(std::nullopt),
+        expected_host_type(std::nullopt),
         expected_port(std::nullopt),
         expected_path(std::nullopt),
         expected_query(std::nullopt),
@@ -57,6 +61,8 @@ struct UriTestPayload {
 
     UriTestPayload(const UriTestPayload& that) = default;
     UriTestPayload& operator=(const UriTestPayload& that) = default;
+    UriTestPayload(UriTestPayload&& that) = default;
+    UriTestPayload& operator=(UriTestPayload&& that) = default;
 
     static UriTestPayload error(const std::string& original_text) {
         return UriTestPayload(original_text, /* expected_status= */ false);
@@ -76,8 +82,10 @@ struct UriTestPayload {
         return *this;
     }
 
-    UriTestPayload& expectHost(const std::string& host) {
+    UriTestPayload& expectHost(const std::string& host,
+                               const uri::__internal::HostType& host_type = uri::__internal::HostType::kRegName) {
         expected_host = host;
+        expected_host_type = std::make_optional(host_type);
         return *this;
     }
 

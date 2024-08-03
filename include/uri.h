@@ -65,6 +65,28 @@ public:
         return !operator==(that);
     }
 
+    friend std::ostream& operator<<(std::ostream& stream, const Uri& that) { 
+        if (that._scheme) {
+            stream << that._scheme.value() << ':';
+        }
+
+        if (that._authority) {
+            stream << "//" << that._authority.value();
+        }
+
+        stream << that._path;
+
+        if (that._query) {
+            stream << '?' << that._query.value();
+        }
+
+        if (that._fragment) {
+            stream << '#' << that._fragment.value();
+        }
+
+        return stream;
+    }
+
     inline const optional_string_t& getScheme() const {
         return _scheme;
     }

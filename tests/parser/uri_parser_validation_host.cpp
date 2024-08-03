@@ -59,13 +59,14 @@ TEST_P(UriParserHostTestingFixture, TestThatHostParsingIsCorrect) {
     const auto& expected_status = validation_data.expected_status;
     const auto& expected_text = validation_data.expected_text;
 
-    std::optional<std::string> parsed_value;
+    std::optional<std::string> parsed_host;
+    std::optional<uri::__internal::HostType> parsed_host_type;
     uri::__internal::TokenReader reader(original_text);
 
-    EXPECT_EQ(uri::__internal::host(reader, parsed_value) && !reader.hasNext(), expected_status);
+    EXPECT_EQ(uri::__internal::host(reader, parsed_host, parsed_host_type) && !reader.hasNext(), expected_status);
 
     // Check only fully matched inputs.
     if (!reader.hasNext()) {
-        EXPECT_EQ(parsed_value, expected_text);
+        EXPECT_EQ(parsed_host, expected_text);
     }
 }

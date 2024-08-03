@@ -30,7 +30,7 @@ std::ostream& operator<<(std::ostream& stream, const UriTestPayload& data) {
     }
 
     if (data.expected_host) {
-        stream << ", expected host = " << data.expected_host.value();
+        stream << ", expected host = " << data.expected_host.value() << " with type: " << static_cast<int>(data.expected_host_type.value());
     }
 
     if (data.expected_port) {

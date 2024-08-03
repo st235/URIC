@@ -83,6 +83,7 @@ bool UriReference(TokenReader& reader,
                   std::optional<std::string>& outScheme,
                   std::optional<std::string>& outUserInfo,
                   std::optional<std::string>& outHost,
+                  std::optional<HostType>& outHostType,
                   std::optional<std::string>& outPort,
                   std::optional<std::string>& outPath,
                   std::optional<std::string>& outQuery,
@@ -90,10 +91,10 @@ bool UriReference(TokenReader& reader,
     auto token = reader.save();
 
     if (Uri(reader, outScheme,
-            outUserInfo, outHost, outPort,
+            outUserInfo, outHost, outHostType, outPort,
             outPath, outQuery, outFragment) ||
         relativeRef(reader,
-                    outUserInfo, outHost, outPort,
+                    outUserInfo, outHost, outHostType, outPort,
                     outPath, outQuery, outFragment)) {
 
         // Math only the entire input.
@@ -105,6 +106,7 @@ bool UriReference(TokenReader& reader,
     outScheme = std::nullopt;
     outUserInfo = std::nullopt;
     outHost = std::nullopt;
+    outHostType = std::nullopt;
     outPort = std::nullopt;
     outPath = std::nullopt;
     outQuery = std::nullopt;
@@ -117,6 +119,7 @@ bool Uri(TokenReader& reader,
          std::optional<std::string>& outScheme,
          std::optional<std::string>& outUserInfo,
          std::optional<std::string>& outHost,
+         std::optional<HostType>& outHostType,
          std::optional<std::string>& outPort,
          std::optional<std::string>& outPath,
          std::optional<std::string>& outQuery,
@@ -126,7 +129,7 @@ bool Uri(TokenReader& reader,
     if (scheme(reader, outScheme) &&
         reader.consume(':') &&
         hierPart(reader,
-                 outUserInfo, outHost, outPort,
+                 outUserInfo, outHost, outHostType, outPort,
                  outPath)) {
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
@@ -151,6 +154,7 @@ bool Uri(TokenReader& reader,
     outScheme = std::nullopt;
     outUserInfo = std::nullopt;
     outHost = std::nullopt;
+    outHostType = std::nullopt;
     outPort = std::nullopt;
     outPath = std::nullopt;
     outQuery = std::nullopt;
@@ -163,6 +167,7 @@ bool AbsoluteUri(TokenReader& reader,
                  std::optional<std::string>& outScheme,
                  std::optional<std::string>& outUserInfo,
                  std::optional<std::string>& outHost,
+                 std::optional<HostType>& outHostType,
                  std::optional<std::string>& outPort,
                  std::optional<std::string>& outPath,
                  std::optional<std::string>& outQuery) {
@@ -170,7 +175,7 @@ bool AbsoluteUri(TokenReader& reader,
 
     if (scheme(reader, outScheme) &&
         reader.consume(':') &&
-        hierPart(reader, outUserInfo, outHost, outPort, outPath)) {
+        hierPart(reader, outUserInfo, outHost, outHostType, outPort, outPath)) {
 
         auto optional1_token = reader.save();
         if (reader.consume('?')) {
@@ -188,6 +193,7 @@ bool AbsoluteUri(TokenReader& reader,
     outScheme = std::nullopt;
     outUserInfo = std::nullopt;
     outHost = std::nullopt;
+    outHostType = std::nullopt;
     outPort = std::nullopt;
     outPath = std::nullopt;
     outQuery = std::nullopt;
@@ -272,12 +278,13 @@ bool queryFragment(TokenReader& reader,
 bool hierPart(TokenReader& reader,
               std::optional<std::string>& outUserInfo,
               std::optional<std::string>& outHost,
+              std::optional<HostType>& outHostType,
               std::optional<std::string>& outPort,
               std::optional<std::string>& outPath) {
     auto token = reader.save();
 
     if (reader.consumeAll("//") &&
-        authority(reader, outUserInfo, outHost, outPort) &&
+        authority(reader, outUserInfo, outHost, outHostType, outPort) &&
         pathAbempty(reader, outPath)) {
         return true;
     }
@@ -304,6 +311,7 @@ bool hierPart(TokenReader& reader,
 bool relativeRef(TokenReader& reader,
                  std::optional<std::string>& outUserInfo,
                  std::optional<std::string>& outHost,
+                 std::optional<HostType>& outHostType,
                  std::optional<std::string>& outPort,
                  std::optional<std::string>& outPath,
                  std::optional<std::string>& outQuery,
@@ -311,7 +319,7 @@ bool relativeRef(TokenReader& reader,
     auto token = reader.save();
 
     if (!relativePart(reader,
-                      outUserInfo, outHost, outPort,
+                      outUserInfo, outHost, outHostType, outPort,
                       outPath)) {
         reader.restore(token);
         return false;
@@ -337,12 +345,13 @@ bool relativeRef(TokenReader& reader,
 bool relativePart(TokenReader& reader,
                   std::optional<std::string>& outUserInfo,
                   std::optional<std::string>& outHost,
+                  std::optional<HostType>& outHostType,
                   std::optional<std::string>& outPort,
                   std::optional<std::string>& outPath) {
     auto token = reader.save();
 
     if (reader.consumeAll("//") &&
-        authority(reader, outUserInfo, outHost, outPort) &&
+        authority(reader, outUserInfo, outHost, outHostType, outPort) &&
         pathAbempty(reader, outPath)) {
         return true;
     }
@@ -367,28 +376,29 @@ bool relativePart(TokenReader& reader,
 }
 
 bool authority(TokenReader& reader,
-               std::optional<std::string>& valueUserInfo,
-               std::optional<std::string>& valueHost,
-               std::optional<std::string>& valuePort) {
+               std::optional<std::string>& outUserInfo,
+               std::optional<std::string>& outHost,
+               std::optional<HostType>& outHostType,
+               std::optional<std::string>& outPort) {
     auto token = reader.save();
 
-    if (userInfo(reader, valueUserInfo)) {
+    if (userInfo(reader, outUserInfo)) {
         if (!reader.consume('@')) {
             // If no @ matched, no
             // user info should be returned.
-            valueUserInfo = std::nullopt;
+            outUserInfo = std::nullopt;
             reader.restore(token);
         }
     }
 
-    if (!host(reader, valueHost)) {
+    if (!host(reader, outHost, outHostType)) {
         reader.restore(token);
         return false;
     }
 
     auto option2_token = reader.save();
     if (reader.consume(':')) {
-        if (!port(reader, valuePort)) {
+        if (!port(reader, outPort)) {
             reader.restore(option2_token);
         }
     }
@@ -410,12 +420,23 @@ bool userInfo(TokenReader& reader,
 }
 
 bool host(TokenReader& reader,
-          std::optional<std::string>& value) {
+          std::optional<std::string>& outHost,
+          std::optional<HostType>& outHostType) {
+    outHostType = std::nullopt;
     auto token = reader.save();
 
-    if (IPLiteral(reader, value) ||
-        IPv4address(reader, value) ||
-        regName(reader, value)) {
+    if (IPLiteral(reader, outHost)) {
+        outHostType = std::make_optional(HostType::kIPLiteral);
+        return true;
+    }
+
+    if (IPv4address(reader, outHost)) {
+        outHostType = std::make_optional(HostType::kIPv4);
+        return true;
+    }
+
+    if (regName(reader, outHost)) {
+        outHostType = std::make_optional(HostType::kRegName);
         return true;
     }
 

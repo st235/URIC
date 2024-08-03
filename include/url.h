@@ -85,6 +85,28 @@ public:
         return !operator==(that);
     }
 
+    friend std::ostream& operator<<(std::ostream& stream, const Url& that) { 
+        if (that._uri.getScheme()) {
+            stream << that._uri.getScheme().value() << ':';
+        }
+
+        if (that._uri.getAuthority()) {
+            stream << "//" << that._uri.getAuthority().value();
+        }
+
+        stream << that._uri.getPath();
+
+        if (that._uri.getQuery()) {
+            stream << '?' << that._uri.getQuery().value();
+        }
+
+        if (that._uri.getFragment()) {
+            stream << '#' << that._uri.getFragment().value();
+        }
+
+        return stream;
+    }
+
     inline const optional_string_t& getScheme() const {
         return _uri.getScheme();
     }
