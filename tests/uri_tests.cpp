@@ -20,8 +20,7 @@ TEST(UriTests, UrisWithDifferentContentAreNotEqual) {
     EXPECT_NE(a, b);
 }
 
-using TestPayload = std::pair<std::string, Uri>;
-class UriTestingFixture: public ::testing::TestWithParam<TestPayload> {};
+class UriTestingFixture: public ::testing::TestWithParam<std::pair<std::string, Uri>> {};
 
 INSTANTIATE_TEST_SUITE_P(
         UriParsingTests,
@@ -104,4 +103,26 @@ TEST_P(UriTestingFixture, TestThatH16ParsingIsCorrect) {
 
     const auto& actual_uri = Uri::parse(input);
     EXPECT_EQ(actual_uri.value(), expected_uri);
+}
+
+class UriSerialisationTestingFixture: public ::testing::TestWithParam<std::pair<Uri, std::string>> {};
+
+INSTANTIATE_TEST_SUITE_P(
+        UriSerialisationTests,
+        UriSerialisationTestingFixture,
+        ::testing::Values(
+            std::make_pair(Uri("https", Authority("localhost"), "/echo", "q=111", std::nullopt), "https://localhost/echo?q=111"),
+            std::make_pair(Uri(std::nullopt, std::nullopt, "/main", "beginner=brass&art=bone", std::nullopt), "/main?beginner=brass&art=bone")
+        )
+);
+
+TEST_P(UriSerialisationTestingFixture, TestThatH16ParsingIsCorrect) {
+    const auto& pair = GetParam();
+
+    const auto& uri = pair.first;
+    const auto& expected_string = pair.second;
+
+    std::stringstream sstream;
+    sstream << uri;
+    EXPECT_EQ(sstream.str(), expected_string);
 }
