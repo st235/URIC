@@ -27,8 +27,9 @@ std::optional<Uri> Uri::parse(const std::string& input) {
     }
 
     std::optional<Authority> authority;
-    if (outHost) {
-        authority = std::make_optional(Authority(outUserInfo, outHost.value(), outPort));
+    if (outHost && outHostType) {
+        bool isHostIPLiteral = outHostType.value() == uri::__internal::HostType::kIPLiteral;
+        authority = std::make_optional(Authority(outHost.value(), outPort, outUserInfo, /* isHostIPLiteral= */ isHostIPLiteral));
     }
 
     return Uri(outScheme, authority, outPath.value(), outQuery, outFragment);

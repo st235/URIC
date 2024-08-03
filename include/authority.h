@@ -20,26 +20,13 @@ class Authority {
 public:
     static std::optional<Authority> parse(const std::string& input);
 
-    explicit Authority(const std::string& host) noexcept:
-        _userInfo(),
-        _host(host),
-        _port() {
-        // Empty on purpose.
-    }
-
     Authority(const std::string& host,
-              const std::string& port) noexcept:
-        _userInfo(),
-        _host(host),
-        _port(std::make_optional(port)) {
-        // Empty on purpose.
-    }
-
-    Authority(const optional_string_t& userInfo,
-              const std::string& host,
-              const optional_string_t& port) noexcept:
+              const optional_string_t& port = std::nullopt,
+              const optional_string_t& userInfo = std::nullopt,
+              bool is_host_ip_literal = false) noexcept:
         _userInfo(userInfo),
         _host(host),
+        _is_host_ip_literal(is_host_ip_literal),
         _port(port) {
         // Empty on purpose.
     }
@@ -52,6 +39,7 @@ public:
     bool operator==(const Authority& that) const {
         return (_userInfo == that._userInfo)
         && (_host == that._host)
+        && (_is_host_ip_literal == that._is_host_ip_literal)
         && (_port == that._port);
     }
 
@@ -64,7 +52,15 @@ public:
             stream << that._userInfo.value() << kUserInfoSeparator;
         }
 
+        if (that._is_host_ip_literal) {
+            stream << '[';
+        }
+
         stream << that._host;
+
+        if (that._is_host_ip_literal) {
+            stream << ']';
+        }
 
         if (that._port) {
             stream << kPortSeparator << that._port.value();
@@ -90,6 +86,7 @@ public:
 private:
     optional_string_t _userInfo;
     std::string _host;
+    bool _is_host_ip_literal;
     optional_string_t _port;
 };
 

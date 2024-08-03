@@ -14,11 +14,12 @@ std::optional<Authority> Authority::parse(const std::string& input) {
     optional_string_t outPort;
     authority(reader, outUserInfo, outHost, outHostType, outPort);
 
-    if (reader.hasNext() || !outHost) {
+    if (reader.hasNext() || !outHost || !outHostType) {
         return std::nullopt;
     }
 
-    return Authority(outUserInfo, outHost.value(), outPort);
+    bool isHostIPLiteral = outHostType.value() == uri::__internal::HostType::kIPLiteral;
+    return Authority(outHost.value(), outPort, outUserInfo, /* isHostIPLiteral= */ isHostIPLiteral);
 }
 
 } // namepsace uri
